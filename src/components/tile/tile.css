@@ -1,0 +1,22 @@
+.tile {
+  height: 80px;
+  width: 80px;
+  border: 1px;
+  border-style: solid;
+  border-color: black;
+}
+.empty {
+  background-color: lightgrey;
+}
+.full {
+  background-color: white;
+}
+.selected {
+  background-color: red;
+}
+.move {
+  background-color: blue;
+}
+.capture {
+  background-color: green;
+}
