@@ -1,21 +1,48 @@
-const pieces = Array(12)
+const piecesCharacters = Array(12)
   .fill("98")
   .map((piece, index) => String.fromCharCode(piece + (index + 12)));
 
-const piecesCreator = {
-  whiteKing: pieces[0],
-  whiteQueen: pieces[1],
-  whiteRook: pieces[2],
-  whiteBishop: pieces[3],
-  whiteKnight: pieces[4],
-  whitePawn: pieces[5],
-  blackKing: pieces[6],
-  blackQueen: pieces[7],
-  blackRook: pieces[8],
-  blackBishop: pieces[9],
-  blackKnight: pieces[10],
-  blackPawn: pieces[11],
-};
+const piecesNames = [
+  "WhiteKing",
+  "WhiteQueen",
+  "WhiteRook",
+  "WhiteBishop",
+  "WhiteKnight",
+  "WhitePawn",
+  "BlackKing",
+  "BlackQueen",
+  "BlackRook",
+  "BlackBishop",
+  "BlackKnight",
+  "BlackPawn",
+];
+
+const pieces = [
+  ...piecesCharacters.map((x) => [piecesNames[piecesCharacters.indexOf(x)], x]),
+];
+
+const piecesCreator = [];
+
+for (let i = 0; i <= 12; i++) {
+  if (i === 5 || i === 11) {
+    piecesCreator.push(
+      pieces[i],
+      pieces[i],
+      pieces[i],
+      pieces[i],
+      pieces[i],
+      pieces[i],
+      pieces[i],
+      pieces[i]
+    );
+  }
+  if ((i > 1 && i < 5) || (i > 7 && i < 11)) {
+    piecesCreator.push(pieces[i], pieces[i]);
+  }
+  if (i === 0 || i === 1 || i === 6 || i === 7) {
+    piecesCreator.push(pieces[i]);
+  }
+}
 
 export { piecesCreator };
 export default piecesCreator;

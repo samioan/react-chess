@@ -1,4 +1,7 @@
 import { Board } from "./components";
+import store from "./models/store";
+import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
 
 const appStyle = {
   textAlign: "center",
@@ -6,10 +9,12 @@ const appStyle = {
 
 const App = () => {
   return (
-    <div>
-      <h1 style={appStyle}>React Chess</h1>
-      <Board />
-    </div>
+    <Provider store={store}>
+      <BrowserRouter>
+        <h1 style={appStyle}>React Chess</h1>
+        <Board />
+      </BrowserRouter>
+    </Provider>
   );
 };
 
