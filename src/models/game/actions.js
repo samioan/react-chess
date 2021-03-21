@@ -8,4 +8,6 @@ const Action = (type) => {
 };
 
 export const startGame = Action("START_GAME");
-export const gameStarted = Action("GAME_STARTED");
+export const piecesCreated = Action("PIECES_CREATED");
+export const piecesSplit = Action("PIECES_SPLIT");
+export const boardCreated = Action("BOARD_CREATED");

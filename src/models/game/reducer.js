@@ -1,20 +1,34 @@
-import { gameStarted } from "./actions";
+import { boardCreated, piecesCreated, piecesSplit } from "./actions";
 
 const initialState = {
-  reservePieces: [],
-  playerPieces: [],
-  aiPieces: [],
+  boardPieces: Array(64).fill({ piece: null }),
+  reservePieces: [{}],
+  playerPieces: [{}],
+  aiPieces: [{}],
 };
 
 const gameReducer = (state = initialState, action) => {
   switch (action.type) {
-    case gameStarted.type: {
+    case piecesCreated.type: {
       return {
         ...state,
         ...action.payload,
       };
     }
 
+    case piecesSplit.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+
+    case boardCreated.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
     default:
       return state;
   }
