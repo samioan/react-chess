@@ -1,14 +1,28 @@
-import { boardCreated, piecesCreated, piecesSplit } from "./actions";
+import {
+  boardCreated,
+  piecesCreated,
+  piecesSplit,
+  piecesPlaced,
+  pieceSelected,
+  pieceUnselected,
+  pieceMoved,
+} from "./actions";
 
 const initialState = {
-  boardPieces: Array(64).fill({ piece: null }),
-  reservePieces: [{}],
-  playerPieces: [{}],
-  aiPieces: [{}],
+  boardPieces: [],
+  reservePieces: [],
+  playerPieces: [],
+  aiPieces: [],
 };
 
 const gameReducer = (state = initialState, action) => {
   switch (action.type) {
+    case boardCreated.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
     case piecesCreated.type: {
       return {
         ...state,
@@ -22,8 +36,25 @@ const gameReducer = (state = initialState, action) => {
         ...action.payload,
       };
     }
-
-    case boardCreated.type: {
+    case piecesPlaced.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case pieceSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case pieceUnselected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case pieceMoved.type: {
       return {
         ...state,
         ...action.payload,

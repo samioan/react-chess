@@ -4,24 +4,25 @@ const piecesCreator = () => {
     .map((piece, index) => String.fromCharCode(piece + (index + 12)));
 
   const piecesNames = [
-    "tile,WhiteKing",
-    "tile,WhiteQueen",
-    "tile,WhiteRook",
-    "tile,WhiteBishop",
-    "tile,WhiteKnight",
-    "tile,WhitePawn",
-    "tile,BlackKing",
-    "tile,BlackQueen",
-    "tile,BlackRook",
-    "tile,BlackBishop",
-    "tile,BlackKnight",
-    "tile,BlackPawn",
+    "whiteKing",
+    "whiteQueen",
+    "whiteRook",
+    "whiteBishop",
+    "whiteKnight",
+    "whitePawn",
+    "blackKing",
+    "blackQueen",
+    "blackRook",
+    "blackBishop",
+    "blackKnight",
+    "blackPawn",
   ];
 
   const pieces = [
-    ...piecesCharacters.map((x) => ({
-      [piecesNames[piecesCharacters.indexOf(x)]]: x,
-    })),
+    ...piecesCharacters.map((x) => [
+      piecesNames[piecesCharacters.indexOf(x)],
+      x,
+    ]),
   ];
 
   const reservePieces = [

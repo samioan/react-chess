@@ -4,47 +4,34 @@ import { connect } from "react-redux";
 
 import "./board.css";
 
-import {
-  boardPieces,
-  reservePieces,
-  playerPieces,
-  aiPieces,
-} from "../../models/game/selectors";
-import { startGame } from "../../models/game/actions";
+import { boardPieces } from "../../models/game/selectors";
+import { startGame, choosePiece } from "../../models/game/actions";
 
-const Board = ({
-  boardPieces,
-  reservePieces,
-  playerPieces,
-  aiPieces,
-  startGame,
-  onClickPlayHandler,
-}) => {
+const Board = ({ boardPieces, onClickPlayHandler, onClickChooseHandler }) => {
   return (
-    <>
+    <div>
       <button onClick={onClickPlayHandler}>Start Game</button>
       <div className="board">
-        {boardPieces.map((pieceSymbol) => (
+        {boardPieces.map((tile, index) => (
           <Tile
-            type={Object.keys(pieceSymbol).toString().split(",")[0]}
-            pieceChar={Object.keys(pieceSymbol).toString().split(",")[1]}
-            symbol={Object.values(pieceSymbol)}
+            key={index}
+            type={tile[1]}
+            symbol={tile[3]}
+            onClick={() => onClickChooseHandler(tile)}
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 
 const mapStateToProps = (state) => ({
   boardPieces: boardPieces(state),
-  reservePieces: reservePieces(state),
-  playerPieces: playerPieces(state),
-  aiPieces: aiPieces(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
   onClickPlayHandler: () => dispatch(startGame()),
+  onClickChooseHandler: (piece) => dispatch(choosePiece(piece)),
 });
 
 export { Board };

@@ -1,19 +1,24 @@
 .tile {
   text-align: center;
   font-size: 60px;
-  cursor: pointer;
   height: 80px;
   width: 80px;
   border: 1px;
   border-style: solid;
   border-color: black;
+}
+.full {
+  cursor: pointer;
   background-color: white;
 }
 .empty {
-  height: 80px;
-  width: 80px;
-  border: 1px;
-  border-style: solid;
-  border-color: black;
-  background-color: lightgrey;
+  background-color: white;
+}
+.selected {
+  cursor: pointer;
+  background-color: red;
+}
+.move {
+  cursor: pointer;
+  background-color: darkred;
 }
