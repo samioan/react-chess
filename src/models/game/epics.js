@@ -106,7 +106,52 @@ const choosePieceEpic = (action$, state$) =>
     ofType(choosePiece.type),
     map((action$) => {
       const originalBoardPieces = boardPieces(state$.value).slice();
-      switch (action$.payload[1]) {
+      const tile = action$.payload;
+      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
+
+      const pawnMoves = [
+        originalBoardPieces[chosenPieceIndex - 8],
+        originalBoardPieces[chosenPieceIndex + 8],
+      ];
+
+      const knightMoves = [
+        originalBoardPieces[chosenPieceIndex - 15],
+        originalBoardPieces[chosenPieceIndex - 17],
+        originalBoardPieces[chosenPieceIndex - 6],
+        originalBoardPieces[chosenPieceIndex - 10],
+        originalBoardPieces[chosenPieceIndex + 15],
+        originalBoardPieces[chosenPieceIndex + 17],
+        originalBoardPieces[chosenPieceIndex + 6],
+        originalBoardPieces[chosenPieceIndex + 10],
+      ];
+
+      const bishopMoves = originalBoardPieces.filter(
+        (item) =>
+          (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 === 0 ||
+          (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 === 0
+      );
+
+      const rookMoves = originalBoardPieces.filter(
+        (item) =>
+          (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 8 === 0 ||
+          (originalBoardPieces.indexOf(item) - chosenPieceIndex > 0 &&
+            originalBoardPieces.indexOf(item) - chosenPieceIndex < 8) ||
+          (originalBoardPieces.indexOf(item) - chosenPieceIndex < 0 &&
+            originalBoardPieces.indexOf(item) - chosenPieceIndex > -8)
+      );
+
+      const kingMoves = [
+        ...pawnMoves,
+        originalBoardPieces[chosenPieceIndex - 1],
+        originalBoardPieces[chosenPieceIndex + 1],
+        originalBoardPieces[chosenPieceIndex - 7],
+        originalBoardPieces[chosenPieceIndex + 7],
+        originalBoardPieces[chosenPieceIndex - 9],
+        originalBoardPieces[chosenPieceIndex + 9],
+      ];
+
+      const queenMoves = [...bishopMoves, ...rookMoves];
+      switch (tile[1]) {
         case "full":
           originalBoardPieces.forEach((item) => {
             if (item[1] === "selected") {
@@ -116,49 +161,133 @@ const choosePieceEpic = (action$, state$) =>
               item.splice(1, 1, "empty");
             }
           });
-          action$.payload.splice(1, 1, "selected");
-          switch (action$.payload[2]) {
-            case "whitePawn":
-              originalBoardPieces[
-                originalBoardPieces.indexOf(action$.payload) - 8
-              ].splice(1, 1, "move");
+          tile.splice(1, 1, "selected");
+          switch (tile[2].slice(5, tile[2].length)) {
+            case "Pawn":
+              switch (tile[2].slice(0, 1)) {
+                case "w":
+                  pawnMoves[0].splice(1, 1, "move");
+                  break;
+                case "b":
+                  pawnMoves[1].splice(1, 1, "move");
+                  break;
+                default:
+              }
               break;
-            case "whiteKnight":
-              originalBoardPieces[
-                originalBoardPieces.indexOf(action$.payload) - 15
-              ].splice(1, 1, "move");
+            case "Knight":
+              knightMoves
+                .filter(
+                  (item) =>
+                    item !== undefined &&
+                    (item[1] === "empty" ||
+                      item[2].charAt(0) !== tile[2].charAt(0))
+                )
+                .forEach((item) => {
+                  item.splice(1, 1, "move");
+                  // console.log("ITEM");
+                  // console.log(originalBoardPieces.indexOf(item));
+                  // console.log("PIECE");
+                  // console.log(chosenPieceIndex);
+                  // console.log("RESULT");
+                  // console.log(
+                  //   chosenPieceIndex - originalBoardPieces.indexOf(item)
+                  // );
+                  // console.log("___________");
+                });
+
+              break;
+            case "Bishop":
+              bishopMoves
+                .filter(
+                  (item) =>
+                    item !== undefined &&
+                    (item[1] === "empty" ||
+                      item[2].charAt(0) !== tile[2].charAt(0))
+                )
+                .forEach((item) => {
+                  item.splice(1, 1, "move");
+                });
+              break;
+            case "Rook":
+              rookMoves
+                .filter(
+                  (item) =>
+                    item !== undefined &&
+                    (item[1] === "empty" ||
+                      item[2].charAt(0) !== tile[2].charAt(0))
+                )
+                .forEach((item) => {
+                  item.splice(1, 1, "move");
+                });
+              break;
+            case "King":
+              kingMoves
+                .filter(
+                  (item) =>
+                    item !== undefined &&
+                    (item[1] === "empty" ||
+                      item[2].charAt(0) !== tile[2].charAt(0))
+                )
+                .forEach((item) => {
+                  item.splice(1, 1, "move");
+                });
+              break;
+            case "Queen":
+              queenMoves
+                .filter(
+                  (item) =>
+                    item !== undefined &&
+                    (item[1] === "empty" ||
+                      item[2].charAt(0) !== tile[2].charAt(0))
+                )
+                .forEach((item) => {
+                  item.splice(1, 1, "move");
+                });
               break;
             default:
           }
           return pieceSelected({
             boardPieces: originalBoardPieces,
           });
+
         case "selected":
           originalBoardPieces.forEach((item) => {
             if (item[1] === "selected") {
               item.splice(1, 1, "full");
             }
             if (item[1] === "move") {
-              item.splice(1, 1, "empty");
+              if (item.length === 4) {
+                item.splice(1, 1, "full");
+              } else item.splice(1, 1, "empty");
             }
           });
           return pieceUnselected({
             boardPieces: originalBoardPieces,
           });
+
         case "move":
           originalBoardPieces.forEach((item) => {
             if (item[1] === "selected") {
-              action$.payload.splice(1, 1, "full");
-              action$.payload.splice(2, 1, item[2]);
-              action$.payload.splice(3, 1, item[3]);
+              tile.splice(1, 1, "full");
+              tile.splice(2, 1, item[2]);
+              tile.splice(3, 1, item[3]);
               item.splice(1, 1, "empty");
               item.splice(2, 1);
               item.splice(3, 1);
+              item.splice(4, 1);
+            }
+          });
+          originalBoardPieces.forEach((item) => {
+            if (item[1] === "move") {
+              if (item.length === 4) {
+                item.splice(1, 1, "full");
+              } else item.splice(1, 1, "empty");
             }
           });
           return pieceMoved({
             boardPieces: originalBoardPieces,
           });
+
         default:
       }
     })
