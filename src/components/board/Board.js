@@ -10,7 +10,11 @@ import { startGame, choosePiece } from "../../models/game/actions";
 const Board = ({ boardPieces, onClickPlayHandler, onClickChooseHandler }) => {
   return (
     <div>
-      <button onClick={onClickPlayHandler}>Start Game</button>
+      {boardPieces.length > 0 ? (
+        <div></div>
+      ) : (
+        <button onClick={onClickPlayHandler}>Start Game</button>
+      )}
       <div className="board">
         {boardPieces.map((tile, index) => (
           <Tile

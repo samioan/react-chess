@@ -6,8 +6,7 @@ import {
   piecesPlaced,
   choosePiece,
   pieceSelected,
-  pieceUnselected,
-  pieceMoved,
+  pawnSelected,
 } from "./actions";
 
 import {
@@ -25,8 +24,7 @@ export {
   piecesPlaced,
   choosePiece,
   pieceSelected,
-  pieceUnselected,
-  pieceMoved,
+  pawnSelected,
   boardPieces,
   reservePieces,
   playerPieces,
