@@ -1,4 +1,4 @@
-import { map, filter, mergeMap } from "rxjs/operators";
+import { map, filter } from "rxjs/operators";
 import { combineEpics, ofType } from "redux-observable";
 
 import {
@@ -110,32 +110,76 @@ const placePiecesEpic = (action$, state$) =>
 const selectPieceEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "full"),
     map((action$) => {
       const originalBoardPieces = boardPieces(state$.value).slice();
       const tile = action$.payload;
 
-      originalBoardPieces.forEach((item) => {
-        if (item[1] === "selected") {
-          item.splice(1, 1, "full");
-        }
-        if (item[1] === "move") {
-          if (item.length === 4) {
-            item.splice(1, 1, "full");
-          } else item.splice(1, 1, "empty");
-        }
-      });
-      tile.splice(1, 1, "selected");
+      switch (tile[1]) {
+        case "full":
+          originalBoardPieces.forEach((item) => {
+            if (item[1] === "selected") {
+              item.splice(1, 1, "full");
+            }
+            if (item[1] === "move") {
+              if (item.length === 4) {
+                item.splice(1, 1, "full");
+              } else item.splice(1, 1, "empty");
+            }
+          });
+          tile.splice(1, 1, "selected");
 
-      return pieceSelected({
-        boardPieces: originalBoardPieces,
-      });
+          return pieceSelected({
+            boardPieces: originalBoardPieces,
+          });
+
+        case "selected":
+          originalBoardPieces.forEach((item) => {
+            if (item[1] === "selected") {
+              item.splice(1, 1, "full");
+            }
+            if (item[1] === "move") {
+              if (item.length === 4) {
+                item.splice(1, 1, "full");
+              } else item.splice(1, 1, "empty");
+            }
+          });
+
+          return pieceDeselected({
+            boardPieces: originalBoardPieces,
+          });
+
+        case "move":
+          originalBoardPieces.forEach((item) => {
+            if (item[1] === "selected") {
+              tile.splice(1, 1, "full");
+              tile.splice(2, 1, item[2]);
+              tile.splice(3, 1, item[3]);
+              item.splice(1, 1, "empty");
+              item.splice(2, 1);
+              item.splice(3, 1);
+              item.splice(4, 1);
+            }
+          });
+          originalBoardPieces.forEach((item) => {
+            if (item[1] === "move") {
+              if (item.length === 4) {
+                item.splice(1, 1, "full");
+              } else item.splice(1, 1, "empty");
+            }
+          });
+
+          return pieceMoved({
+            boardPieces: originalBoardPieces,
+          });
+        default:
+      }
     })
   );
 
 const selectPawnEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
         action$.payload[2].slice(5, action$.payload[2].length) === "Pawn"
@@ -152,10 +196,22 @@ const selectPawnEpic = (action$, state$) =>
 
       switch (tile[2].slice(0, 1)) {
         case "w":
-          pawnMoves[0].splice(1, 1, "move");
+          if (
+            pawnMoves[0] !== undefined &&
+            (pawnMoves[0][1] === "empty" ||
+              pawnMoves[0][2].charAt(0) !== tile[2].charAt(0))
+          ) {
+            pawnMoves[0].splice(1, 1, "move");
+          }
           break;
         case "b":
-          pawnMoves[1].splice(1, 1, "move");
+          if (
+            pawnMoves[1] !== undefined &&
+            (pawnMoves[1][1] === "empty" ||
+              pawnMoves[1][2].charAt(0) !== tile[2].charAt(0))
+          ) {
+            pawnMoves[1].splice(1, 1, "move");
+          }
           break;
         default:
       }
@@ -169,6 +225,7 @@ const selectPawnEpic = (action$, state$) =>
 const selectRookEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
         action$.payload[2].slice(5, action$.payload[2].length) === "Rook"
@@ -206,6 +263,7 @@ const selectRookEpic = (action$, state$) =>
 const selectKnightEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
         action$.payload[2].slice(5, action$.payload[2].length) === "Knight"
@@ -245,6 +303,7 @@ const selectKnightEpic = (action$, state$) =>
 const selectBishopEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
         action$.payload[2].slice(5, action$.payload[2].length) === "Bishop"
@@ -279,6 +338,7 @@ const selectBishopEpic = (action$, state$) =>
 const selectQueenEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
         action$.payload[2].slice(5, action$.payload[2].length) === "Queen"
@@ -323,6 +383,7 @@ const selectQueenEpic = (action$, state$) =>
 const selectKingEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
         action$.payload[2].slice(5, action$.payload[2].length) === "King"
@@ -359,62 +420,6 @@ const selectKingEpic = (action$, state$) =>
     })
   );
 
-// const deselectPieceEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType(choosePiece.type),
-//     filter((action$) => action$.payload[1] === "selected"),
-//     map((action$) => {
-//       const originalBoardPieces = boardPieces(state$.value).slice();
-//       const tile = action$.payload;
-
-//       originalBoardPieces.forEach((item) => {
-//         if (item[1] === "move") {
-//           if (item.length === 4) {
-//             item.splice(1, 1, "full");
-//           } else item.splice(1, 1, "empty");
-//         }
-//       });
-//       tile.splice(1, 1, "full");
-
-//       return pieceDeselected({
-//         boardPieces: originalBoardPieces,
-//       });
-//     })
-//   );
-
-const movePieceEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "move"),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-      const tile = action$.payload;
-
-      originalBoardPieces.forEach((item) => {
-        if (item[1] === "selected") {
-          tile.splice(1, 1, "full");
-          tile.splice(2, 1, item[2]);
-          tile.splice(3, 1, item[3]);
-          item.splice(1, 1, "empty");
-          item.splice(2, 1);
-          item.splice(3, 1);
-          item.splice(4, 1);
-        }
-      });
-      originalBoardPieces.forEach((item) => {
-        if (item[1] === "move") {
-          if (item.length === 4) {
-            item.splice(1, 1, "full");
-          } else item.splice(1, 1, "empty");
-        }
-      });
-
-      return pieceMoved({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
 export default combineEpics(
   createBoardEpic,
   createPiecesEpic,
@@ -426,9 +431,7 @@ export default combineEpics(
   selectKnightEpic,
   selectBishopEpic,
   selectQueenEpic,
-  selectKingEpic,
-  // deselectPieceEpic,
-  movePieceEpic
+  selectKingEpic
 );
 
 export {
@@ -443,6 +446,4 @@ export {
   selectBishopEpic,
   selectQueenEpic,
   selectKingEpic,
-  // deselectPieceEpic,
-  movePieceEpic,
 };
