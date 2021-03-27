@@ -4,7 +4,13 @@ import {
   piecesSplit,
   piecesPlaced,
   pieceSelected,
-  pieceUnselected,
+  pawnSelected,
+  rookSelected,
+  knightSelected,
+  bishopSelected,
+  queenSelected,
+  kingSelected,
+  pieceDeselected,
   pieceMoved,
 } from "./actions";
 
@@ -48,7 +54,43 @@ const gameReducer = (state = initialState, action) => {
         ...action.payload,
       };
     }
-    case pieceUnselected.type: {
+    case pawnSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case rookSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case knightSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case bishopSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case queenSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case kingSelected.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case pieceDeselected.type: {
       return {
         ...state,
         ...action.payload,
