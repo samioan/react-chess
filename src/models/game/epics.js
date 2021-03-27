@@ -80,20 +80,20 @@ const placePiecesEpic = (action$, state$) =>
 
       const playerBoardPieces = originalBoardPieces
         .slice(0, 16)
-        .map((item, index) => [item, "full", newPlayerPieces[index]].flat());
+        .map((item, index) => [item, "full", newAiPieces[index]].flat());
 
       const aiBoardPieces = originalBoardPieces
         .slice(48, 64)
-        .map((item, index) => [item, "full", newAiPieces[index]].flat());
+        .map((item, index) => [item, "full", newPlayerPieces[index]].flat());
 
       const emptyBoardPieces = originalBoardPieces
         .slice(16, 48)
         .map((item) => [item, "empty"].flat());
 
       const newBoardPieces = [
-        ...aiBoardPieces,
-        ...emptyBoardPieces,
         ...playerBoardPieces,
+        ...emptyBoardPieces,
+        ...aiBoardPieces,
       ];
 
       newPlayerPieces.splice(0, newPlayerPieces.length);

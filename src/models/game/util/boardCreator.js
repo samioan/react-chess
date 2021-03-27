@@ -6,7 +6,7 @@ const boardCreator = () => {
 
   const files = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
-  const board = [...rows.map((x) => files.map((y) => x + y))].flat();
+  const board = [...rows.map((x) => files.map((y) => y + x))].flat();
   return board;
 };
 
