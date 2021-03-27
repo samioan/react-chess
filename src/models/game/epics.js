@@ -284,11 +284,20 @@ const selectKnightEpic = (action$, state$) =>
         originalBoardPieces[chosenPieceIndex + 10],
       ];
 
+      const columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
       knightMoves
         .filter(
           (item) =>
             item !== undefined &&
             (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
+        )
+        .filter(
+          (item) =>
+            columns.indexOf(tile[0].charAt(0)) + 2 >=
+              columns.indexOf(item[0].charAt(0)) &&
+            columns.indexOf(item[0].charAt(0)) >=
+              columns.indexOf(tile[0].charAt(0)) - 2
         )
         .forEach((item) => {
           item.splice(1, 1, "move");
