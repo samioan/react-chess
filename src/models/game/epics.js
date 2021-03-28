@@ -28,6 +28,13 @@ import {
 import piecesArranger from "./util/piecesArranger";
 import boardCreator from "./util/boardCreator";
 import piecesCreator from "./util/piecesCreator";
+import pawnMoves from "./util/piecesMoves/pawnMoves";
+import rookMoves from "./util/piecesMoves/rookMoves";
+import knightMoves from "./util/piecesMoves/knightMoves";
+import bishopMoves from "./util/piecesMoves/bishopMoves";
+import queenMoves from "./util/piecesMoves/queenMoves";
+import kingMoves from "./util/piecesMoves/kingMoves";
+import { deselectPiece, movePiece, selectPiece } from "./util/pieceSelection";
 
 const createBoardEpic = (action$, state$) =>
   action$.pipe(
@@ -88,7 +95,7 @@ const placePiecesEpic = (action$, state$) =>
 
       const emptyBoardPieces = originalBoardPieces
         .slice(16, 48)
-        .map((item) => [item, "empty"].flat());
+        .map((item) => [item, "empty", ""].flat());
 
       const newBoardPieces = [
         ...playerBoardPieces,
@@ -110,63 +117,28 @@ const placePiecesEpic = (action$, state$) =>
 const selectPieceEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
+    filter((action$) => action$.payload[1] !== "empty"),
     map((action$) => {
       const originalBoardPieces = boardPieces(state$.value).slice();
       const tile = action$.payload;
 
       switch (tile[1]) {
         case "full":
-          originalBoardPieces.forEach((item) => {
-            if (item[1] === "selected") {
-              item.splice(1, 1, "full");
-            }
-            if (item[1] === "move") {
-              if (item.length === 4) {
-                item.splice(1, 1, "full");
-              } else item.splice(1, 1, "empty");
-            }
-          });
-          tile.splice(1, 1, "selected");
+          selectPiece(originalBoardPieces, tile);
 
           return pieceSelected({
             boardPieces: originalBoardPieces,
           });
 
         case "selected":
-          originalBoardPieces.forEach((item) => {
-            if (item[1] === "selected") {
-              item.splice(1, 1, "full");
-            }
-            if (item[1] === "move") {
-              if (item.length === 4) {
-                item.splice(1, 1, "full");
-              } else item.splice(1, 1, "empty");
-            }
-          });
+          deselectPiece(originalBoardPieces);
 
           return pieceDeselected({
             boardPieces: originalBoardPieces,
           });
 
         case "move":
-          originalBoardPieces.forEach((item) => {
-            if (item[1] === "selected") {
-              tile.splice(1, 1, "full");
-              tile.splice(2, 1, item[2]);
-              tile.splice(3, 1, item[3]);
-              item.splice(1, 1, "empty");
-              item.splice(2, 1);
-              item.splice(3, 1);
-              item.splice(4, 1);
-            }
-          });
-          originalBoardPieces.forEach((item) => {
-            if (item[1] === "move") {
-              if (item.length === 4) {
-                item.splice(1, 1, "full");
-              } else item.splice(1, 1, "empty");
-            }
-          });
+          movePiece(originalBoardPieces, tile);
 
           return pieceMoved({
             boardPieces: originalBoardPieces,
@@ -179,9 +151,9 @@ const selectPieceEpic = (action$, state$) =>
 const selectPawnEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
+        action$.payload[1] === "selected" &&
         action$.payload[2].slice(5, action$.payload[2].length) === "Pawn"
     ),
     map((action$) => {
@@ -189,32 +161,7 @@ const selectPawnEpic = (action$, state$) =>
       const tile = action$.payload;
       const chosenPieceIndex = originalBoardPieces.indexOf(tile);
 
-      const pawnMoves = [
-        originalBoardPieces[chosenPieceIndex - 8],
-        originalBoardPieces[chosenPieceIndex + 8],
-      ];
-
-      switch (tile[2].slice(0, 1)) {
-        case "w":
-          if (
-            pawnMoves[0] !== undefined &&
-            (pawnMoves[0][1] === "empty" ||
-              pawnMoves[0][2].charAt(0) !== tile[2].charAt(0))
-          ) {
-            pawnMoves[0].splice(1, 1, "move");
-          }
-          break;
-        case "b":
-          if (
-            pawnMoves[1] !== undefined &&
-            (pawnMoves[1][1] === "empty" ||
-              pawnMoves[1][2].charAt(0) !== tile[2].charAt(0))
-          ) {
-            pawnMoves[1].splice(1, 1, "move");
-          }
-          break;
-        default:
-      }
+      pawnMoves(originalBoardPieces, chosenPieceIndex, tile);
 
       return pawnSelected({
         boardPieces: originalBoardPieces,
@@ -225,9 +172,9 @@ const selectPawnEpic = (action$, state$) =>
 const selectRookEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
+        action$.payload[1] === "selected" &&
         action$.payload[2].slice(5, action$.payload[2].length) === "Rook"
     ),
     map((action$) => {
@@ -235,24 +182,7 @@ const selectRookEpic = (action$, state$) =>
       const tile = action$.payload;
       const chosenPieceIndex = originalBoardPieces.indexOf(tile);
 
-      const rookMoves = originalBoardPieces.filter(
-        (item) =>
-          (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 8 === 0 ||
-          (originalBoardPieces.indexOf(item) - chosenPieceIndex > 0 &&
-            originalBoardPieces.indexOf(item) - chosenPieceIndex < 8) ||
-          (originalBoardPieces.indexOf(item) - chosenPieceIndex < 0 &&
-            originalBoardPieces.indexOf(item) - chosenPieceIndex > -8)
-      );
-
-      rookMoves
-        .filter(
-          (item) =>
-            item !== undefined &&
-            (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
-        )
-        .forEach((item) => {
-          item.splice(1, 1, "move");
-        });
+      rookMoves(originalBoardPieces, chosenPieceIndex, tile);
 
       return rookSelected({
         boardPieces: originalBoardPieces,
@@ -263,9 +193,9 @@ const selectRookEpic = (action$, state$) =>
 const selectKnightEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
+        action$.payload[1] === "selected" &&
         action$.payload[2].slice(5, action$.payload[2].length) === "Knight"
     ),
     map((action$) => {
@@ -273,26 +203,7 @@ const selectKnightEpic = (action$, state$) =>
       const tile = action$.payload;
       const chosenPieceIndex = originalBoardPieces.indexOf(tile);
 
-      const knightMoves = [
-        originalBoardPieces[chosenPieceIndex - 15],
-        originalBoardPieces[chosenPieceIndex - 17],
-        originalBoardPieces[chosenPieceIndex - 6],
-        originalBoardPieces[chosenPieceIndex - 10],
-        originalBoardPieces[chosenPieceIndex + 15],
-        originalBoardPieces[chosenPieceIndex + 17],
-        originalBoardPieces[chosenPieceIndex + 6],
-        originalBoardPieces[chosenPieceIndex + 10],
-      ];
-
-      knightMoves
-        .filter(
-          (item) =>
-            item !== undefined &&
-            (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
-        )
-        .forEach((item) => {
-          item.splice(1, 1, "move");
-        });
+      knightMoves(originalBoardPieces, chosenPieceIndex, tile);
 
       return knightSelected({
         boardPieces: originalBoardPieces,
@@ -303,9 +214,9 @@ const selectKnightEpic = (action$, state$) =>
 const selectBishopEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
+        action$.payload[1] === "selected" &&
         action$.payload[2].slice(5, action$.payload[2].length) === "Bishop"
     ),
     map((action$) => {
@@ -313,21 +224,7 @@ const selectBishopEpic = (action$, state$) =>
       const tile = action$.payload;
       const chosenPieceIndex = originalBoardPieces.indexOf(tile);
 
-      const bishopMoves = originalBoardPieces.filter(
-        (item) =>
-          (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 === 0 ||
-          (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 === 0
-      );
-
-      bishopMoves
-        .filter(
-          (item) =>
-            item !== undefined &&
-            (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
-        )
-        .forEach((item) => {
-          item.splice(1, 1, "move");
-        });
+      bishopMoves(originalBoardPieces, chosenPieceIndex, tile);
 
       return bishopSelected({
         boardPieces: originalBoardPieces,
@@ -338,9 +235,9 @@ const selectBishopEpic = (action$, state$) =>
 const selectQueenEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
+        action$.payload[1] === "selected" &&
         action$.payload[2].slice(5, action$.payload[2].length) === "Queen"
     ),
     map((action$) => {
@@ -348,31 +245,7 @@ const selectQueenEpic = (action$, state$) =>
       const tile = action$.payload;
       const chosenPieceIndex = originalBoardPieces.indexOf(tile);
 
-      const queenMoves = [
-        ...originalBoardPieces.filter(
-          (item) =>
-            (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 === 0 ||
-            (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 === 0
-        ),
-        ...originalBoardPieces.filter(
-          (item) =>
-            (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 8 === 0 ||
-            (originalBoardPieces.indexOf(item) - chosenPieceIndex > 0 &&
-              originalBoardPieces.indexOf(item) - chosenPieceIndex < 8) ||
-            (originalBoardPieces.indexOf(item) - chosenPieceIndex < 0 &&
-              originalBoardPieces.indexOf(item) - chosenPieceIndex > -8)
-        ),
-      ];
-
-      queenMoves
-        .filter(
-          (item) =>
-            item !== undefined &&
-            (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
-        )
-        .forEach((item) => {
-          item.splice(1, 1, "move");
-        });
+      queenMoves(originalBoardPieces, chosenPieceIndex, tile);
 
       return queenSelected({
         boardPieces: originalBoardPieces,
@@ -383,9 +256,9 @@ const selectQueenEpic = (action$, state$) =>
 const selectKingEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    filter((action$) => action$.payload[1] === "selected"),
     filter(
       (action$) =>
+        action$.payload[1] === "selected" &&
         action$.payload[2].slice(5, action$.payload[2].length) === "King"
     ),
     map((action$) => {
@@ -393,26 +266,7 @@ const selectKingEpic = (action$, state$) =>
       const tile = action$.payload;
       const chosenPieceIndex = originalBoardPieces.indexOf(tile);
 
-      const kingMoves = [
-        originalBoardPieces[chosenPieceIndex - 1],
-        originalBoardPieces[chosenPieceIndex + 1],
-        originalBoardPieces[chosenPieceIndex - 7],
-        originalBoardPieces[chosenPieceIndex + 7],
-        originalBoardPieces[chosenPieceIndex - 8],
-        originalBoardPieces[chosenPieceIndex + 8],
-        originalBoardPieces[chosenPieceIndex - 9],
-        originalBoardPieces[chosenPieceIndex + 9],
-      ];
-
-      kingMoves
-        .filter(
-          (item) =>
-            item !== undefined &&
-            (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
-        )
-        .forEach((item) => {
-          item.splice(1, 1, "move");
-        });
+      kingMoves(originalBoardPieces, chosenPieceIndex, tile);
 
       return kingSelected({
         boardPieces: originalBoardPieces,
