@@ -28,7 +28,7 @@ import {
 import piecesArranger from "./util/piecesArranger";
 import boardCreator from "./util/boardCreator";
 import piecesCreator from "./util/piecesCreator";
-import { pawnMoves } from "./util/piecesMoves/pawnMoves";
+import pawnMoves from "./util/piecesMoves/pawnMoves";
 import rookMoves from "./util/piecesMoves/rookMoves";
 import knightMoves from "./util/piecesMoves/knightMoves";
 import bishopMoves from "./util/piecesMoves/bishopMoves";
@@ -95,7 +95,7 @@ const placePiecesEpic = (action$, state$) =>
 
       const emptyBoardPieces = originalBoardPieces
         .slice(16, 48)
-        .map((item) => [item, "empty"].flat());
+        .map((item) => [item, "empty", ""].flat());
 
       const newBoardPieces = [
         ...playerBoardPieces,

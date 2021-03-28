@@ -9,10 +9,9 @@
 }
 .full {
   cursor: pointer;
-  background-color: white;
 }
 .empty {
-  background-color: white;
+  cursor: default;
 }
 .selected {
   cursor: pointer;
@@ -22,3 +21,12 @@
   cursor: pointer;
   background-color: rgb(157, 172, 255);
 }
+
+.light {
+  background-color: rgb(204, 183, 174);
+}
+
+.dark {
+  background-color: rgb(112, 102, 119);
+}
+
