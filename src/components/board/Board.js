@@ -9,7 +9,7 @@ import { startGame, choosePiece } from "../../models/game/actions";
 import colorPicker from "../../lib/colorPicker";
 
 const Board = ({ boardPieces, onClickPlayHandler, onClickChooseHandler }) => {
-  useEffect((boardPieces) => {
+  useEffect(() => {
     onClickPlayHandler();
   }, []);
 
