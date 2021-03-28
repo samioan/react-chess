@@ -244,11 +244,25 @@ const selectRookEpic = (action$, state$) =>
             originalBoardPieces.indexOf(item) - chosenPieceIndex > -8)
       );
 
+      const columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
       rookMoves
         .filter(
           (item) =>
             item !== undefined &&
             (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
+        )
+        .filter(
+          (item) =>
+            (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 8 === 0 ||
+            (originalBoardPieces.indexOf(item) - chosenPieceIndex > 0 &&
+              originalBoardPieces.indexOf(item) - chosenPieceIndex < 8 &&
+              columns.indexOf(tile[0].charAt(0)) <
+                columns.indexOf(item[0].charAt(0))) ||
+            (originalBoardPieces.indexOf(item) - chosenPieceIndex < 0 &&
+              originalBoardPieces.indexOf(item) - chosenPieceIndex > -8 &&
+              columns.indexOf(tile[0].charAt(0)) >
+                columns.indexOf(item[0].charAt(0)))
         )
         .forEach((item) => {
           item.splice(1, 1, "move");
@@ -328,11 +342,36 @@ const selectBishopEpic = (action$, state$) =>
           (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 === 0
       );
 
+      const columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
       bishopMoves
         .filter(
           (item) =>
             item !== undefined &&
             (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
+        )
+        .filter(
+          (item) =>
+            (chosenPieceIndex > originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) <
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex > originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) >
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex < originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) >
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex < originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) <
+                columns.indexOf(item[0].charAt(0)))
         )
         .forEach((item) => {
           item.splice(1, 1, "move");
@@ -373,11 +412,45 @@ const selectQueenEpic = (action$, state$) =>
         ),
       ];
 
+      const columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
       queenMoves
         .filter(
           (item) =>
             item !== undefined &&
             (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
+        )
+        .filter(
+          (item) =>
+            (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 8 === 0 ||
+            (originalBoardPieces.indexOf(item) - chosenPieceIndex > 0 &&
+              originalBoardPieces.indexOf(item) - chosenPieceIndex < 8 &&
+              columns.indexOf(tile[0].charAt(0)) <
+                columns.indexOf(item[0].charAt(0))) ||
+            (originalBoardPieces.indexOf(item) - chosenPieceIndex < 0 &&
+              originalBoardPieces.indexOf(item) - chosenPieceIndex > -8 &&
+              columns.indexOf(tile[0].charAt(0)) >
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex > originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) <
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex > originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) >
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex < originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 7 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) >
+                columns.indexOf(item[0].charAt(0))) ||
+            (chosenPieceIndex < originalBoardPieces.indexOf(item) &&
+              (originalBoardPieces.indexOf(item) - chosenPieceIndex) % 9 ===
+                0 &&
+              columns.indexOf(tile[0].charAt(0)) <
+                columns.indexOf(item[0].charAt(0)))
         )
         .forEach((item) => {
           item.splice(1, 1, "move");
@@ -413,11 +486,20 @@ const selectKingEpic = (action$, state$) =>
         originalBoardPieces[chosenPieceIndex + 9],
       ];
 
+      const columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
       kingMoves
         .filter(
           (item) =>
             item !== undefined &&
             (item[1] === "empty" || item[2].charAt(0) !== tile[2].charAt(0))
+        )
+        .filter(
+          (item) =>
+            columns.indexOf(tile[0].charAt(0)) + 1 >=
+              columns.indexOf(item[0].charAt(0)) &&
+            columns.indexOf(item[0].charAt(0)) >=
+              columns.indexOf(tile[0].charAt(0)) - 1
         )
         .forEach((item) => {
           item.splice(1, 1, "move");
