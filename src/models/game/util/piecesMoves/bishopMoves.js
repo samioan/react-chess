@@ -44,7 +44,12 @@ const bishopMoves = (piecesArray, pieceIndex, piece) => {
   const bishopArrayBig = [];
 
   newBishopMoves.forEach((item) => {
-    item.splice(1, 1, "empty");
+    if (item.length === 3) {
+      item.splice(1, 1, "empty");
+    }
+    if (item.length === 4) {
+      item.splice(1, 1, "full");
+    }
     if (item[0][0] < piece[0][0]) {
       bishopArraySmall.push(item);
     }
@@ -102,11 +107,13 @@ const bishopMoves = (piecesArray, pieceIndex, piece) => {
         newLine.push(oldLine[i]);
       }
     }
+
     return newLine;
   };
 
   const newUpLineMaker = (oldLine, newLine) => {
     let counter = 1;
+
     for (var i = oldLine.length - 1; i > -1; i--) {
       let oldLineNumber = Number(oldLine[i][0][1]);
       const pieceNumber = Number(piece[0][1]);
@@ -116,6 +123,7 @@ const bishopMoves = (piecesArray, pieceIndex, piece) => {
         counter++;
       }
     }
+
     return newLine;
   };
 
@@ -124,14 +132,101 @@ const bishopMoves = (piecesArray, pieceIndex, piece) => {
   newUpLineMaker(line2, newLine2);
   newUpLineMaker(line4, newLine4);
 
-  const newerBishopMoves = [
-    ...newLine1,
-    ...newLine2,
-    ...newLine3,
-    ...newLine4,
-  ].forEach((item) => {
+  const newerLine1 = newLine1.filter((item) => item.length === 3);
+  const newerLine2 = newLine2.filter((item) => item.length === 3);
+  const newerLine3 = newLine3.filter((item) => item.length === 3);
+  const newerLine4 = newLine4.filter((item) => item.length === 3);
+
+  const newerLineEnemies1 = newLine1.filter((item) => item.length === 4);
+  const newerLineEnemies2 = newLine2.filter((item) => item.length === 4);
+  const newerLineEnemies3 = newLine3.filter((item) => item.length === 4);
+  const newerLineEnemies4 = newLine4.filter((item) => item.length === 4);
+
+  if (newerLineEnemies1.length > 0) {
+    newerLine1.push(newerLineEnemies1[0]);
+  }
+
+  if (newerLineEnemies2.length > 0) {
+    newerLine2.push(newerLineEnemies2[0]);
+  }
+
+  if (newerLineEnemies3.length > 0) {
+    newerLine3.push(newerLineEnemies3[0]);
+  }
+
+  if (newerLineEnemies4.length > 0) {
+    newerLine4.push(newerLineEnemies4[0]);
+  }
+
+  const finalLine1 = [];
+  const finalLine2 = [];
+  const finalLine3 = [];
+  const finalLine4 = [];
+
+  const finalDownLineMaker = (newLine, finalLine, newLineEnemies) => {
+    if (newLineEnemies.length > 0) {
+      for (var i = 0; i < newLine.length; i++) {
+        let newLineNumber = Number(newLine[i][0][1]);
+        const enemyNumber = Number(newLineEnemies[0][0][1]);
+
+        if (newLineNumber > enemyNumber) {
+          finalLine.push(newLine[i]);
+        }
+      }
+      finalLine.push(newLineEnemies[0]);
+
+      return finalLine;
+    }
+  };
+
+  const finalUpLineMaker = (newLine, finalLine, newLineEnemies) => {
+    if (newLineEnemies.length > 0) {
+      for (var i = 0; i < newLine.length; i++) {
+        let newLineNumber = Number(newLine[i][0][1]);
+        const enemyNumber = Number(newLineEnemies[0][0][1]);
+
+        if (newLineNumber < enemyNumber) {
+          finalLine.push(newLine[i]);
+        }
+      }
+      finalLine.push(newLineEnemies[0]);
+
+      return finalLine;
+    }
+  };
+
+  finalDownLineMaker(newLine1, finalLine1, newerLineEnemies1);
+  finalDownLineMaker(newLine3, finalLine3, newerLineEnemies3);
+  finalUpLineMaker(newLine2, finalLine2, newerLineEnemies2);
+  finalUpLineMaker(newLine4, finalLine4, newerLineEnemies4);
+
+  const newerBishopMoves = [];
+
+  if (newerLineEnemies1.length > 0) {
+    newerBishopMoves.push(...finalLine1);
+  } else newerBishopMoves.push(...newLine1);
+
+  if (newerLineEnemies2.length > 0) {
+    newerBishopMoves.push(...finalLine2);
+  } else newerBishopMoves.push(...newLine2);
+
+  if (newerLineEnemies3.length > 0) {
+    newerBishopMoves.push(...finalLine3);
+  } else newerBishopMoves.push(...newLine3);
+
+  if (newerLineEnemies4.length > 0) {
+    newerBishopMoves.push(...finalLine4);
+  } else newerBishopMoves.push(...newLine4);
+
+  newerBishopMoves.forEach((item) => {
     item.splice(1, 1, "move");
   });
+
+  console.log(finalLine1);
+  console.log(finalLine2);
+  console.log(finalLine3);
+  console.log(finalLine4);
+
   return newerBishopMoves;
 };
 
