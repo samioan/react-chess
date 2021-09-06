@@ -53,9 +53,6 @@ const bishopMoves = (piecesArray, pieceIndex, piece) => {
     if (item[0][0] < piece[0][0]) {
       bishopArraySmall.push(item);
     }
-  });
-
-  newBishopMoves.forEach((item) => {
     if (item[0][0] > piece[0][0]) {
       bishopArrayBig.push(item);
     }
@@ -221,11 +218,6 @@ const bishopMoves = (piecesArray, pieceIndex, piece) => {
   newerBishopMoves.forEach((item) => {
     item.splice(1, 1, "move");
   });
-
-  console.log(finalLine1);
-  console.log(finalLine2);
-  console.log(finalLine3);
-  console.log(finalLine4);
 
   return newerBishopMoves;
 };
