@@ -14,18 +14,16 @@ const Board = ({ boardPieces, onClickPlayHandler, onClickChooseHandler }) => {
   }, []);
 
   return (
-    <div>
-      <div className="board">
-        {boardPieces.map((tile, index) => (
-          <Tile
-            key={index}
-            color={colorPicker(tile)}
-            type={tile[1]}
-            symbol={tile[3]}
-            onClick={() => onClickChooseHandler(tile)}
-          />
-        ))}
-      </div>
+    <div className="board">
+      {boardPieces.map((tile, index) => (
+        <Tile
+          key={index}
+          color={colorPicker(tile)}
+          type={tile[1]}
+          symbol={tile[3]}
+          onClick={() => onClickChooseHandler(tile)}
+        />
+      ))}
     </div>
   );
 };
