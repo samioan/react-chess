@@ -12,6 +12,7 @@ import {
   kingSelected,
   pieceDeselected,
   pieceMoved,
+  pawnPromoted,
 } from "./actions";
 
 const initialState = {
@@ -97,6 +98,12 @@ const gameReducer = (state = initialState, action) => {
       };
     }
     case pieceMoved.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case pawnPromoted.type: {
       return {
         ...state,
         ...action.payload,

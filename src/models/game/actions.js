@@ -22,3 +22,4 @@ export const queenSelected = Action("QUEEN_SELECTED");
 export const kingSelected = Action("KING_SELECTED");
 export const pieceDeselected = Action("PIECE_DESELECTED");
 export const pieceMoved = Action("PIECE_MOVED");
+export const pawnPromoted = Action("PAWN_PROMOTED");
