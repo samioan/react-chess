@@ -23,6 +23,7 @@ import {
   kingSelected,
   pieceDeselected,
   pieceMoved,
+  pawnPromoted,
 } from "./actions";
 
 import piecesArranger from "./util/piecesArranger";
@@ -145,6 +146,40 @@ const selectPieceEpic = (action$, state$) =>
           });
         default:
       }
+    })
+  );
+
+const pawnPromotedEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(pieceMoved.type),
+    filter(
+      (action$) =>
+        action$.payload.boardPieces
+          .slice(0, 7)
+          .toString()
+          .includes("whitePawn") ||
+        action$.payload.boardPieces
+          .slice(56, 63)
+          .toString()
+          .includes("blackPawn")
+    ),
+    map((action$) => {
+      const originalBoardPieces = boardPieces(state$.value).slice();
+
+      originalBoardPieces.forEach((item) => {
+        if (item[0][1] === "8" && item[2] === "whitePawn") {
+          item.splice(2, 1, "whiteQueen");
+          item.splice(3, 1, String.fromCharCode("9813"));
+        }
+        if (item[0][1] === "1" && item[2] === "blackPawn") {
+          item.splice(2, 1, "blackQueen");
+          item.splice(3, 1, String.fromCharCode("9819"));
+        }
+      });
+
+      return pawnPromoted({
+        boardPieces: originalBoardPieces,
+      });
     })
   );
 
@@ -280,6 +315,7 @@ export default combineEpics(
   splitPiecesEpic,
   placePiecesEpic,
   selectPieceEpic,
+  pawnPromotedEpic,
   selectPawnEpic,
   selectRookEpic,
   selectKnightEpic,
@@ -294,6 +330,7 @@ export {
   splitPiecesEpic,
   placePiecesEpic,
   selectPieceEpic,
+  pawnPromotedEpic,
   selectPawnEpic,
   selectRookEpic,
   selectKnightEpic,
