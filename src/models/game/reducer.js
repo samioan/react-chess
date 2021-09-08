@@ -16,6 +16,7 @@ import {
 } from "./actions";
 
 const initialState = {
+  playersTurn: "w",
   boardPieces: [],
   reservePieces: [],
   playerPieces: [],

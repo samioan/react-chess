@@ -2,6 +2,7 @@ import { map, filter } from "rxjs/operators";
 import { combineEpics, ofType } from "redux-observable";
 
 import {
+  playersTurn,
   reservePieces,
   playerPieces,
   aiPieces,
@@ -42,8 +43,9 @@ const createBoardEpic = (action$, state$) =>
     ofType(startGame.type),
     map(() => {
       const newBoardPieces = boardCreator();
-
+      const firstPlayer = "w";
       return boardCreated({
+        playersTurn: firstPlayer,
         boardPieces: newBoardPieces,
       });
     })
@@ -121,16 +123,19 @@ const selectPieceEpic = (action$, state$) =>
     filter((action$) => action$.payload[1] !== "empty"),
     map((action$) => {
       const originalBoardPieces = boardPieces(state$.value).slice();
+      const originalPlayersTurn = playersTurn(state$.value).slice();
+      const blackTurn = "b";
+      const whiteTurn = "w";
       const tile = action$.payload;
 
       switch (tile[1]) {
         case "full":
-          selectPiece(originalBoardPieces, tile);
-
+          if (tile[2][0] === originalPlayersTurn) {
+            selectPiece(originalBoardPieces, tile);
+          }
           return pieceSelected({
             boardPieces: originalBoardPieces,
           });
-
         case "selected":
           deselectPiece(originalBoardPieces);
 
@@ -142,6 +147,7 @@ const selectPieceEpic = (action$, state$) =>
           movePiece(originalBoardPieces, tile);
 
           return pieceMoved({
+            playersTurn: originalPlayersTurn === "w" ? blackTurn : whiteTurn,
             boardPieces: originalBoardPieces,
           });
         default:
@@ -149,7 +155,7 @@ const selectPieceEpic = (action$, state$) =>
     })
   );
 
-const pawnPromotedEpic = (action$, state$) =>
+const promotePawnEpic = (action$, state$) =>
   action$.pipe(
     ofType(pieceMoved.type),
     filter(
@@ -163,7 +169,7 @@ const pawnPromotedEpic = (action$, state$) =>
           .toString()
           .includes("blackPawn")
     ),
-    map((action$) => {
+    map(() => {
       const originalBoardPieces = boardPieces(state$.value).slice();
 
       originalBoardPieces.forEach((item) => {
@@ -315,7 +321,7 @@ export default combineEpics(
   splitPiecesEpic,
   placePiecesEpic,
   selectPieceEpic,
-  pawnPromotedEpic,
+  promotePawnEpic,
   selectPawnEpic,
   selectRookEpic,
   selectKnightEpic,
@@ -330,7 +336,7 @@ export {
   splitPiecesEpic,
   placePiecesEpic,
   selectPieceEpic,
-  pawnPromotedEpic,
+  promotePawnEpic,
   selectPawnEpic,
   selectRookEpic,
   selectKnightEpic,
