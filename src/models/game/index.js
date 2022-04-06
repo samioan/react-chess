@@ -8,6 +8,9 @@ import {
   pieceSelected,
   pawnSelected,
   pawnPromoted,
+  whiteKingChecked,
+  blackKingChecked,
+  continueGame,
 } from "./actions";
 
 import {
@@ -27,6 +30,9 @@ export {
   pieceSelected,
   pawnSelected,
   pawnPromoted,
+  whiteKingChecked,
+  blackKingChecked,
+  continueGame,
   boardPieces,
   reservePieces,
   playerPieces,

@@ -13,9 +13,13 @@ import {
   pieceDeselected,
   pieceMoved,
   pawnPromoted,
+  whiteKingChecked,
+  blackKingChecked,
+  continueGame,
 } from "./actions";
 
 const initialState = {
+  playersTurn: "w",
   boardPieces: [],
   reservePieces: [],
   playerPieces: [],
@@ -36,7 +40,6 @@ const gameReducer = (state = initialState, action) => {
         ...action.payload,
       };
     }
-
     case piecesSplit.type: {
       return {
         ...state,
@@ -104,6 +107,24 @@ const gameReducer = (state = initialState, action) => {
       };
     }
     case pawnPromoted.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case whiteKingChecked.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case blackKingChecked.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case continueGame.type: {
       return {
         ...state,
         ...action.payload,

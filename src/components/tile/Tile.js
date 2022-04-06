@@ -1,11 +1,12 @@
 import React from "react";
 
-import "./tile.css";
+import styles from "./styles";
 
 const Tile = ({ type, color, symbol, onClick }) => {
+  const classes = styles();
   return (
-    <div className={color}>
-      <div className={"tile " + type} onClick={onClick}>
+    <div className={classes[color]}>
+      <div className={`${classes.tile} ${classes[type]}`} onClick={onClick}>
         <div>{symbol}</div>
       </div>
     </div>
