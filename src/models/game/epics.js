@@ -25,6 +25,9 @@ import {
   pieceDeselected,
   pieceMoved,
   pawnPromoted,
+  whiteKingChecked,
+  blackKingChecked,
+  continueGame,
 } from "./actions";
 
 import piecesArranger from "./util/piecesArranger";
@@ -36,6 +39,7 @@ import knightMoves from "./util/piecesMoves/knightMoves";
 import bishopMoves from "./util/piecesMoves/bishopMoves";
 import queenMoves from "./util/piecesMoves/queenMoves";
 import kingMoves from "./util/piecesMoves/kingMoves";
+import checkmate from "./util/piecesMoves/checkmate";
 import { deselectPiece, movePiece, selectPiece } from "./util/pieceSelection";
 
 const createBoardEpic = (action$, state$) =>
@@ -111,6 +115,7 @@ const placePiecesEpic = (action$, state$) =>
 
       return piecesPlaced({
         boardPieces: newBoardPieces,
+        reservePieces: [newBoardPieces],
         playerPieces: newPlayerPieces,
         aiPieces: newAiPieces,
       });
@@ -122,7 +127,8 @@ const selectPieceEpic = (action$, state$) =>
     ofType(choosePiece.type),
     filter((action$) => action$.payload[1] !== "empty"),
     map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
+      const originalBoardPieces = boardPieces(state$.value).slice(0);
+      const originalReservePieces = reservePieces(state$.value).slice(0);
       const originalPlayersTurn = playersTurn(state$.value).slice();
       const blackTurn = "b";
       const whiteTurn = "w";
@@ -144,11 +150,13 @@ const selectPieceEpic = (action$, state$) =>
           });
 
         case "move":
+          originalReservePieces.push(boardPieces(state$.value));
           movePiece(originalBoardPieces, tile);
 
           return pieceMoved({
             playersTurn: originalPlayersTurn === "w" ? blackTurn : whiteTurn,
             boardPieces: originalBoardPieces,
+            reservePieces: originalReservePieces,
           });
         default:
       }
@@ -315,6 +323,63 @@ const selectKingEpic = (action$, state$) =>
     })
   );
 
+const checkEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(pieceMoved.type),
+    map(() => {
+      const originalPlayersTurn = playersTurn(state$.value).slice();
+      const originalBoardPieces = boardPieces(state$.value).slice();
+      const tile =
+        originalPlayersTurn === "w"
+          ? originalBoardPieces.find((item) => item[2] === "blackKing")
+          : originalBoardPieces.find((item) => item[2] === "whiteKing");
+      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
+
+      const checkmateArray = checkmate(
+        originalBoardPieces,
+        chosenPieceIndex,
+        tile
+      );
+
+      if (
+        originalPlayersTurn === "b" &&
+        checkmateArray?.some((item) => item.length === 4 && item[2][0] === "b")
+      ) {
+        return whiteKingChecked({
+          boardPieces:
+            (movePiece(originalBoardPieces, tile), originalBoardPieces),
+        });
+      }
+
+      if (
+        originalPlayersTurn === "w" &&
+        checkmateArray?.some((item) => item.length === 4 && item[2][0] === "w")
+      ) {
+        return blackKingChecked({
+          boardPieces:
+            (movePiece(originalBoardPieces, tile), originalBoardPieces),
+        });
+      }
+      return continueGame({
+        boardPieces:
+          (movePiece(originalBoardPieces, tile), originalBoardPieces),
+      });
+    })
+  );
+
+const returnWhiteMoveEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(whiteKingChecked.type),
+    map(() =>
+      continueGame({
+        playersTurn: "w",
+        boardPieces: reservePieces(state$.value)[
+          reservePieces(state$.value).length - 1
+        ],
+      })
+    )
+  );
+
 export default combineEpics(
   createBoardEpic,
   createPiecesEpic,
@@ -327,7 +392,9 @@ export default combineEpics(
   selectKnightEpic,
   selectBishopEpic,
   selectQueenEpic,
-  selectKingEpic
+  selectKingEpic,
+  checkEpic,
+  returnWhiteMoveEpic
 );
 
 export {
@@ -343,4 +410,6 @@ export {
   selectBishopEpic,
   selectQueenEpic,
   selectKingEpic,
+  checkEpic,
+  returnWhiteMoveEpic,
 };

@@ -1,16 +1,22 @@
 import React, { useEffect } from "react";
 import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Tile from "../tile";
 import { connect } from "react-redux";
 
-import { boardPieces } from "../../models/game/selectors";
+import { boardPieces, playersTurn } from "../../models/game/selectors";
 import { startGame, choosePiece } from "../../models/game/actions";
 import colorPicker from "../../lib/colorPicker";
 
 import styles from "./styles";
 
-const Board = ({ boardPieces, onClickPlayHandler, onClickChooseHandler }) => {
+const Board = ({
+  boardPieces,
+  onClickPlayHandler,
+  onClickChooseHandler,
+  playersTurn,
+}) => {
   const classes = styles();
 
   useEffect(() => {
@@ -34,12 +40,17 @@ const Board = ({ boardPieces, onClickPlayHandler, onClickChooseHandler }) => {
           />
         ))}
       </div>
+
+      <Typography variant="h6" align="center" gutterBottom>
+        {playersTurn === "w" ? "Whites Play" : "Blacks Play"}
+      </Typography>
     </div>
   );
 };
 
 const mapStateToProps = (state) => ({
   boardPieces: boardPieces(state),
+  playersTurn: playersTurn(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

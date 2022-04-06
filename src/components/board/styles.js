@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const styles = makeStyles(() => ({
   board: {
     paddingTop: 20,
+    paddingBottom: 20,
     justifyContent: "center",
     alignContent: "center",
     display: "grid",

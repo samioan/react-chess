@@ -23,3 +23,6 @@ export const kingSelected = Action("KING_SELECTED");
 export const pieceDeselected = Action("PIECE_DESELECTED");
 export const pieceMoved = Action("PIECE_MOVED");
 export const pawnPromoted = Action("PAWN_PROMOTED");
+export const whiteKingChecked = Action("WHITE_KING_CHECKED");
+export const blackKingChecked = Action("BLACK_KING_CHECKED");
+export const continueGame = Action("CONTINUE_GAME");
