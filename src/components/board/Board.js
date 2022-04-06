@@ -42,7 +42,7 @@ const Board = ({
       </div>
 
       <Typography variant="h6" align="center" gutterBottom>
-        {playersTurn === "w" ? "Whites Play" : "Blacks Play"}
+        {playersTurn === "w" ? "White Plays" : "Black Plays"}
       </Typography>
     </div>
   );
