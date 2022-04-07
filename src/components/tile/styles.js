@@ -10,11 +10,8 @@ const styles = makeStyles(() => ({
     borderStyle: "solid",
     borderColor: "black",
   },
-  full: {
+  idle: {
     cursor: "pointer",
-  },
-  empty: {
-    cursor: "default",
   },
   selected: {
     cursor: "pointer",

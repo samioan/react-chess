@@ -1,9 +1,5 @@
 import {
   boardCreated,
-  piecesCreated,
-  piecesSplit,
-  piecesPlaced,
-  pieceSelected,
   pawnSelected,
   rookSelected,
   knightSelected,
@@ -13,46 +9,17 @@ import {
   pieceDeselected,
   pieceMoved,
   pawnPromoted,
-  whiteKingChecked,
-  blackKingChecked,
-  continueGame,
 } from "./actions";
 
 const initialState = {
-  playersTurn: "w",
+  playersTurn: "white",
   boardPieces: [],
-  reservePieces: [],
-  playerPieces: [],
-  aiPieces: [],
+  movesLog: [],
 };
 
 const gameReducer = (state = initialState, action) => {
   switch (action.type) {
     case boardCreated.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case piecesCreated.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case piecesSplit.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case piecesPlaced.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case pieceSelected.type: {
       return {
         ...state,
         ...action.payload,
@@ -107,24 +74,6 @@ const gameReducer = (state = initialState, action) => {
       };
     }
     case pawnPromoted.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case whiteKingChecked.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case blackKingChecked.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case continueGame.type: {
       return {
         ...state,
         ...action.payload,
