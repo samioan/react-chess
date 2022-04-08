@@ -6,7 +6,7 @@ const deselectPiece = (piece, pieces) => {
         if (item.rank) {
           item.status = "idle";
         } else {
-          delete item["status"];
+          item.status = null;
         }
       }
     })

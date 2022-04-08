@@ -53,10 +53,12 @@ const Board = ({
           ))
         )}
         {/* {console.log(
-          boardPieces
-            .map((row) => row.filter((item) => item.status === "selected"))
-            .filter((row) => row.length > 0)
-            .flat()
+          item.status !== "selected" ||
+            (item.status !== "move" &&
+              boardPieces
+                .map((row) => row.filter((item) => item.status === "selected"))
+                .filter((row) => row.length > 0)
+                .flat())
         )} */}
       </div>
 

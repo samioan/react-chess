@@ -10,6 +10,10 @@ const createEmptyBoard = () => {
       row.map((item, itemIndex) => ({
         id: item,
         position: `${rowIndex}${itemIndex}`,
+        color: null,
+        rank: null,
+        unicodeSymbol: null,
+        status: null,
       }))
     );
   return board;

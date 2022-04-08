@@ -19,13 +19,11 @@ import {
 
 import { createEmptyBoard, placePiecesOnBoard } from "./util/board";
 import rookMoves from "./util/piecesMoves/rookMoves";
-import knightMoves from "./util/piecesMoves/knightMoves";
 import bishopMoves from "./util/piecesMoves/bishopMoves";
 import queenMoves from "./util/piecesMoves/queenMoves";
-import kingMoves from "./util/piecesMoves/kingMoves";
 
 import { selectPiece, deselectPiece, movePiece } from "./util/piecesActions";
-import { selectPawn, selectKnight } from "./util/piecesMoves";
+import { selectPawn, selectKnight, selectKing } from "./util/piecesMoves";
 
 const createBoardEpic = (action$) =>
   action$.pipe(
@@ -65,6 +63,11 @@ const selectPieceEpic = (action$, state$) =>
               case "knight":
                 selectKnight(piece, originalBoardPieces);
                 return knightSelected({
+                  boardPieces: originalBoardPieces,
+                });
+              case "king":
+                selectKing(piece, originalBoardPieces);
+                return kingSelected({
                   boardPieces: originalBoardPieces,
                 });
               default:
@@ -147,27 +150,6 @@ const selectRookEpic = (action$, state$) =>
     })
   );
 
-const selectKnightEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(choosePiece.type),
-    filter(
-      (action$) =>
-        action$.payload[1] === "selected" &&
-        action$.payload[2].slice(5, action$.payload[2].length) === "Knight"
-    ),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-      const tile = action$.payload;
-      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
-
-      knightMoves(originalBoardPieces, chosenPieceIndex, tile);
-
-      return knightSelected({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
 const selectBishopEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
@@ -210,36 +192,13 @@ const selectQueenEpic = (action$, state$) =>
     })
   );
 
-const selectKingEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(choosePiece.type),
-    filter(
-      (action$) =>
-        action$.payload[1] === "selected" &&
-        action$.payload[2].slice(5, action$.payload[2].length) === "King"
-    ),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-      const tile = action$.payload;
-      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
-
-      kingMoves(originalBoardPieces, chosenPieceIndex, tile);
-
-      return kingSelected({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
 export default combineEpics(
   createBoardEpic,
   selectPieceEpic,
   promotePawnEpic,
   selectRookEpic,
-  selectKnightEpic,
   selectBishopEpic,
-  selectQueenEpic,
-  selectKingEpic
+  selectQueenEpic
 );
 
 export {
@@ -247,8 +206,6 @@ export {
   selectPieceEpic,
   promotePawnEpic,
   selectRookEpic,
-  selectKnightEpic,
   selectBishopEpic,
   selectQueenEpic,
-  selectKingEpic,
 };

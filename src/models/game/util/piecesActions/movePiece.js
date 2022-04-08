@@ -8,10 +8,10 @@ const movePiece = (piece, pieces) => {
   piece.status = "idle";
   piece.unicodeSymbol = selectedPiece.unicodeSymbol;
 
-  delete selectedPiece["color"];
-  delete selectedPiece["rank"];
-  delete selectedPiece["status"];
-  delete selectedPiece["unicodeSymbol"];
+  selectedPiece.color = null;
+  selectedPiece.rank = null;
+  selectedPiece.status = null;
+  selectedPiece.unicodeSymbol = null;
 };
 
 export { movePiece };
