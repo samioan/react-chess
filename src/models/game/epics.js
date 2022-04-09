@@ -54,7 +54,7 @@ const selectPieceEpic = (action$, state$) =>
 
       switch (piece.status) {
         case "idle":
-          selectPiece(piece);
+          selectPiece(piece, originalBoardPieces);
 
           if (piece.status === "selected") {
             switch (piece.rank) {

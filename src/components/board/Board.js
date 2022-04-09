@@ -40,26 +40,15 @@ const Board = ({
                 item.unicodeSymbol && String.fromCharCode(item.unicodeSymbol)
               }
               onClick={
-                item.status &&
-                (boardPieces
-                  .map((row) => row.find((item) => item.status === "selected"))
-                  .filter((item) => item !== undefined)[0]?.color ===
-                  playersTurn ||
-                  item.color === playersTurn)
+                item.status === "selected" ||
+                item.status === "move" ||
+                item.color === playersTurn
                   ? () => onClickChooseHandler(item)
                   : () => {}
               }
             />
           ))
         )}
-        {/* {console.log(
-          item.status !== "selected" ||
-            (item.status !== "move" &&
-              boardPieces
-                .map((row) => row.filter((item) => item.status === "selected"))
-                .filter((row) => row.length > 0)
-                .flat())
-        )} */}
       </div>
 
       <Typography variant="h6" align="center" gutterBottom>
