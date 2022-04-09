@@ -27,6 +27,7 @@ import {
   selectKing,
   selectBishop,
 } from "./util/piecesMoves";
+import { promotePawn } from "./util/specialActions";
 
 const createBoardEpic = (action$) =>
   action$.pipe(
@@ -120,28 +121,17 @@ const promotePawnEpic = (action$, state$) =>
     ofType(pieceMoved.type),
     filter(
       (action$) =>
-        action$.payload.boardPieces
-          .slice(0, 7)
-          .toString()
-          .includes("whitePawn") ||
-        action$.payload.boardPieces
-          .slice(56, 63)
-          .toString()
-          .includes("blackPawn")
+        action$.payload.boardPieces[0].some(
+          (item) => item.color === "white" && item.rank === "pawn"
+        ) ||
+        action$.payload.boardPieces[7].some(
+          (item) => item.color === "black" && item.rank === "pawn"
+        )
     ),
     map(() => {
       const originalBoardPieces = boardPieces(state$.value).slice();
 
-      originalBoardPieces.forEach((item) => {
-        if (item[0][1] === "8" && item[2] === "whitePawn") {
-          item.splice(2, 1, "whiteQueen");
-          item.splice(3, 1, String.fromCharCode("9813"));
-        }
-        if (item[0][1] === "1" && item[2] === "blackPawn") {
-          item.splice(2, 1, "blackQueen");
-          item.splice(3, 1, String.fromCharCode("9819"));
-        }
-      });
+      promotePawn(originalBoardPieces);
 
       return pawnPromoted({
         boardPieces: originalBoardPieces,
