@@ -18,9 +18,7 @@ const selectPawn = (piece, pieces) => {
     .filter(
       (item) =>
         item.length === 2 &&
-        Number(item.charAt(0)) >= 0 &&
         Number(item.charAt(0)) <= 7 &&
-        Number(item.charAt(1)) >= 0 &&
         Number(item.charAt(1)) <= 7
     )
     .map((item) => pieces[item.charAt(0)][item.charAt(1)]);

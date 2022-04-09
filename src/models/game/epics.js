@@ -18,12 +18,15 @@ import {
 } from "./actions";
 
 import { createEmptyBoard, placePiecesOnBoard } from "./util/board";
-import rookMoves from "./util/piecesMoves/rookMoves";
-import bishopMoves from "./util/piecesMoves/bishopMoves";
-import queenMoves from "./util/piecesMoves/queenMoves";
 
 import { selectPiece, deselectPiece, movePiece } from "./util/piecesActions";
-import { selectPawn, selectKnight, selectKing } from "./util/piecesMoves";
+import {
+  selectPawn,
+  selectKnight,
+  selectRook,
+  selectKing,
+  selectBishop,
+} from "./util/piecesMoves";
 
 const createBoardEpic = (action$) =>
   action$.pipe(
@@ -63,6 +66,23 @@ const selectPieceEpic = (action$, state$) =>
               case "knight":
                 selectKnight(piece, originalBoardPieces);
                 return knightSelected({
+                  boardPieces: originalBoardPieces,
+                });
+              case "rook":
+                selectRook(piece, originalBoardPieces);
+                return rookSelected({
+                  boardPieces: originalBoardPieces,
+                });
+              case "bishop":
+                selectBishop(piece, originalBoardPieces);
+                return bishopSelected({
+                  boardPieces: originalBoardPieces,
+                });
+              case "queen":
+                selectRook(piece, originalBoardPieces);
+                selectBishop(piece, originalBoardPieces);
+
+                return queenSelected({
                   boardPieces: originalBoardPieces,
                 });
               case "king":
@@ -129,83 +149,6 @@ const promotePawnEpic = (action$, state$) =>
     })
   );
 
-const selectRookEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(choosePiece.type),
-    filter(
-      (action$) =>
-        action$.payload[1] === "selected" &&
-        action$.payload[2].slice(5, action$.payload[2].length) === "Rook"
-    ),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-      const tile = action$.payload;
-      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
+export default combineEpics(createBoardEpic, selectPieceEpic, promotePawnEpic);
 
-      rookMoves(originalBoardPieces, chosenPieceIndex, tile);
-
-      return rookSelected({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
-const selectBishopEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(choosePiece.type),
-    filter(
-      (action$) =>
-        action$.payload[1] === "selected" &&
-        action$.payload[2].slice(5, action$.payload[2].length) === "Bishop"
-    ),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-      const tile = action$.payload;
-      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
-
-      bishopMoves(originalBoardPieces, chosenPieceIndex, tile);
-
-      return bishopSelected({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
-const selectQueenEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(choosePiece.type),
-    filter(
-      (action$) =>
-        action$.payload[1] === "selected" &&
-        action$.payload[2].slice(5, action$.payload[2].length) === "Queen"
-    ),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-      const tile = action$.payload;
-      const chosenPieceIndex = originalBoardPieces.indexOf(tile);
-
-      queenMoves(originalBoardPieces, chosenPieceIndex, tile);
-
-      return queenSelected({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
-export default combineEpics(
-  createBoardEpic,
-  selectPieceEpic,
-  promotePawnEpic,
-  selectRookEpic,
-  selectBishopEpic,
-  selectQueenEpic
-);
-
-export {
-  createBoardEpic,
-  selectPieceEpic,
-  promotePawnEpic,
-  selectRookEpic,
-  selectBishopEpic,
-  selectQueenEpic,
-};
+export { createBoardEpic, selectPieceEpic, promotePawnEpic };
