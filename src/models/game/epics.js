@@ -1,7 +1,6 @@
 import { map, filter } from "rxjs/operators";
 import { combineEpics, ofType } from "redux-observable";
 
-import { playersTurn, boardPieces, movesLog } from "./selectors";
 import {
   startGame,
   boardCreated,
@@ -15,7 +14,16 @@ import {
   pieceDeselected,
   pieceMoved,
   pawnPromoted,
-} from "./actions";
+  whiteKingChecked,
+  blackKingChecked,
+  gameResumed,
+  moveStored,
+  moveDeleted,
+  playersTurn,
+  boardPieces,
+  movesLog,
+  lastPlayer,
+} from "../game";
 
 import { createEmptyBoard, placePiecesOnBoard } from "./util/board";
 
@@ -27,7 +35,11 @@ import {
   selectKing,
   selectBishop,
 } from "./util/piecesMoves";
-import { promotePawn } from "./util/specialActions";
+import {
+  promotePawn,
+  checkmate,
+  cleanPiecesStatus,
+} from "./util/specialActions";
 
 const createBoardEpic = (action$) =>
   action$.pipe(
@@ -55,27 +67,32 @@ const selectPieceEpic = (action$, state$) =>
 
       switch (piece.status) {
         case "idle":
+          cleanPiecesStatus(originalBoardPieces);
           selectPiece(piece, originalBoardPieces);
 
           if (piece.status === "selected") {
             switch (piece.rank) {
               case "pawn":
                 selectPawn(piece, originalBoardPieces);
+
                 return pawnSelected({
                   boardPieces: originalBoardPieces,
                 });
               case "knight":
                 selectKnight(piece, originalBoardPieces);
+
                 return knightSelected({
                   boardPieces: originalBoardPieces,
                 });
               case "rook":
                 selectRook(piece, originalBoardPieces);
+
                 return rookSelected({
                   boardPieces: originalBoardPieces,
                 });
               case "bishop":
                 selectBishop(piece, originalBoardPieces);
+
                 return bishopSelected({
                   boardPieces: originalBoardPieces,
                 });
@@ -88,6 +105,7 @@ const selectPieceEpic = (action$, state$) =>
                 });
               case "king":
                 selectKing(piece, originalBoardPieces);
+
                 return kingSelected({
                   boardPieces: originalBoardPieces,
                 });
@@ -96,7 +114,8 @@ const selectPieceEpic = (action$, state$) =>
           }
           break;
         case "selected":
-          deselectPiece(piece, originalBoardPieces);
+          cleanPiecesStatus(originalBoardPieces);
+          deselectPiece(piece);
 
           return pieceDeselected({
             boardPieces: originalBoardPieces,
@@ -104,10 +123,10 @@ const selectPieceEpic = (action$, state$) =>
 
         case "move":
           movePiece(piece, originalBoardPieces);
-          deselectPiece(piece, originalBoardPieces);
+          cleanPiecesStatus(originalBoardPieces);
 
           return pieceMoved({
-            playersTurn:
+            lastPlayer:
               playersTurn(state$.value) === "white" ? "black" : "white",
             boardPieces: originalBoardPieces,
           });
@@ -139,6 +158,88 @@ const promotePawnEpic = (action$, state$) =>
     })
   );
 
-export default combineEpics(createBoardEpic, selectPieceEpic, promotePawnEpic);
+const checkmateEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(pieceMoved.type),
+    map(() => {
+      const originalBoardPieces = boardPieces(state$.value).slice();
 
-export { createBoardEpic, selectPieceEpic, promotePawnEpic };
+      if (checkmate(originalBoardPieces, "white", "black")) {
+        cleanPiecesStatus(originalBoardPieces);
+
+        return whiteKingChecked({
+          playersTurn: "white",
+          boardPieces:
+            lastPlayer(state$.value) === "black"
+              ? movesLog(state$.value)[movesLog(state$.value).length - 1]
+              : originalBoardPieces,
+        });
+      }
+      if (checkmate(originalBoardPieces, "black", "white")) {
+        cleanPiecesStatus(originalBoardPieces);
+
+        return blackKingChecked({
+          playersTurn: "black",
+          boardPieces:
+            lastPlayer(state$.value) === "white"
+              ? movesLog(state$.value)[movesLog(state$.value).length - 1]
+              : originalBoardPieces,
+        });
+      }
+
+      cleanPiecesStatus(originalBoardPieces);
+
+      return gameResumed({
+        playersTurn: playersTurn(state$.value) === "white" ? "black" : "white",
+        boardPieces: originalBoardPieces,
+      });
+    })
+  );
+
+const storePreviousMoveEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(gameResumed.type, blackKingChecked.type, whiteKingChecked.type),
+    map(() => {
+      const boardPiecesCopy = JSON.parse(
+        JSON.stringify(boardPieces(state$.value))
+      );
+
+      return moveStored({
+        movesLog: [...movesLog(state$.value), boardPiecesCopy],
+      });
+    })
+  );
+
+const deletePreviousMoveEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(moveStored.type),
+    filter((action$) => action$.payload.movesLog.length > 10),
+    map(() => {
+      const newMovesLog = movesLog(state$.value).slice(
+        1,
+        movesLog(state$.value).length
+      );
+
+      return moveDeleted({
+        movesLog: newMovesLog,
+      });
+    })
+  );
+
+export default combineEpics(
+  createBoardEpic,
+  selectPieceEpic,
+  promotePawnEpic,
+  checkmateEpic,
+  storePreviousMoveEpic,
+  deletePreviousMoveEpic
+);
+
+export {
+  createBoardEpic,
+  selectPieceEpic,
+  promotePawnEpic,
+  checkmateEpic,
+  storePreviousMoveEpic,
+  deletePreviousMoveEpic,
+};

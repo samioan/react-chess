@@ -42,6 +42,7 @@ const selectKing = (piece, pieces) => {
       item.status = "move";
     }
   });
+  return kingMoves;
 };
 
 export { selectKing };

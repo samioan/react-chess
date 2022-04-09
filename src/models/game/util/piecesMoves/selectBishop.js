@@ -112,6 +112,7 @@ const selectBishop = (piece, pieces) => {
     .forEach((item) => {
       item.status = "move";
     });
+  return bishopMoves;
 };
 
 export { selectBishop };

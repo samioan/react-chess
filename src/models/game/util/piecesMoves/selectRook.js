@@ -84,6 +84,8 @@ const selectRook = (piece, pieces) => {
     .forEach((item) => {
       item.status = "move";
     });
+
+  return rookMoves;
 };
 
 export { selectRook };

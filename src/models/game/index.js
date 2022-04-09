@@ -4,9 +4,21 @@ import {
   choosePiece,
   pawnSelected,
   pawnPromoted,
+  rookSelected,
+  knightSelected,
+  bishopSelected,
+  queenSelected,
+  kingSelected,
+  pieceDeselected,
+  pieceMoved,
+  whiteKingChecked,
+  blackKingChecked,
+  gameResumed,
+  moveStored,
+  moveDeleted,
 } from "./actions";
 
-import { boardPieces, playersTurn, movesLog } from "./selectors";
+import { boardPieces, playersTurn, movesLog, lastPlayer } from "./selectors";
 
 export {
   startGame,
@@ -14,7 +26,20 @@ export {
   choosePiece,
   pawnSelected,
   pawnPromoted,
+  rookSelected,
+  knightSelected,
+  bishopSelected,
+  queenSelected,
+  kingSelected,
+  pieceDeselected,
+  pieceMoved,
+  whiteKingChecked,
+  blackKingChecked,
+  gameResumed,
+  moveStored,
+  moveDeleted,
   boardPieces,
   playersTurn,
   movesLog,
+  lastPlayer,
 };
