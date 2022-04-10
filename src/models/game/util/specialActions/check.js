@@ -6,18 +6,10 @@ import {
   selectPawn,
 } from "../piecesMoves";
 
-const checkmate = (pieces, pieceColor, enemyPieceColor) => {
-  const king = pieces
-    .map((row) =>
-      row.filter((item) => item.rank === "king" && item.color === pieceColor)
-    )
-    .find((item) => item.length === 1)[0];
-
-  const kingCheck = [
-    ...selectBishop(king, pieces),
-    ...selectRook(king, pieces),
-    ...selectKnight(king, pieces),
-  ];
+const check = (pieces, pieceColor, enemyPieceColor) => {
+  const kingCheck = pieces
+    .map((row) => row.filter((item) => item.color === enemyPieceColor))
+    .flat();
 
   const kingDanger = [];
 
@@ -76,11 +68,10 @@ const checkmate = (pieces, pieceColor, enemyPieceColor) => {
     });
 
     if (kingDanger.length > 0) {
-      console.log(`${pieceColor} danger!`, kingDanger);
       return true;
     }
   }
 };
 
-export { checkmate };
-export default checkmate;
+export { check };
+export default check;

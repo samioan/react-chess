@@ -31,7 +31,8 @@ const selectPawn = (piece, pieces) => {
       item.status = "move";
     }
   });
-  return pawnMoves;
+
+  return pawnMoves.filter((item) => item.status === "move");
 };
 
 export { selectPawn };

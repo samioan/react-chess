@@ -1,5 +1,5 @@
 import promotePawn from "./promotePawn";
-import checkmate from "./checkmate";
+import check from "./check";
 import cleanPiecesStatus from "./cleanPiecesStatus";
 
-export { promotePawn, checkmate, cleanPiecesStatus };
+export { promotePawn, check, cleanPiecesStatus };

@@ -15,10 +15,17 @@ import {
   blackKingChecked,
   gameResumed,
   moveStored,
-  moveDeleted,
+  moveAddedToLog,
+  moveDeletedFromLog,
 } from "./actions";
 
-import { boardPieces, playersTurn, movesLog, lastPlayer } from "./selectors";
+import {
+  boardPieces,
+  playersTurn,
+  previousMovePieces,
+  lastPlayer,
+  movesLog,
+} from "./selectors";
 
 export {
   startGame,
@@ -37,9 +44,11 @@ export {
   blackKingChecked,
   gameResumed,
   moveStored,
-  moveDeleted,
+  moveAddedToLog,
+  moveDeletedFromLog,
   boardPieces,
   playersTurn,
-  movesLog,
+  previousMovePieces,
   lastPlayer,
+  movesLog,
 };

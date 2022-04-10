@@ -13,13 +13,15 @@ import {
   blackKingChecked,
   gameResumed,
   moveStored,
-  moveDeleted,
+  moveAddedToLog,
+  moveDeletedFromLog,
 } from "./actions";
 
 const initialState = {
   playersTurn: "white",
   lastPlayer: null,
   boardPieces: [],
+  previousMovePieces: [],
   movesLog: [],
 };
 
@@ -109,7 +111,13 @@ const gameReducer = (state = initialState, action) => {
         ...action.payload,
       };
     }
-    case moveDeleted.type: {
+    case moveAddedToLog.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case moveDeletedFromLog.type: {
       return {
         ...state,
         ...action.payload,

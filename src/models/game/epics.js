@@ -18,11 +18,13 @@ import {
   blackKingChecked,
   gameResumed,
   moveStored,
-  moveDeleted,
+  moveAddedToLog,
+  moveDeletedFromLog,
   playersTurn,
   boardPieces,
-  movesLog,
+  previousMovePieces,
   lastPlayer,
+  movesLog,
 } from "../game";
 
 import { createEmptyBoard, placePiecesOnBoard } from "./util/board";
@@ -35,11 +37,7 @@ import {
   selectKing,
   selectBishop,
 } from "./util/piecesMoves";
-import {
-  promotePawn,
-  checkmate,
-  cleanPiecesStatus,
-} from "./util/specialActions";
+import { promotePawn, check, cleanPiecesStatus } from "./util/specialActions";
 
 const createBoardEpic = (action$) =>
   action$.pipe(
@@ -158,31 +156,31 @@ const promotePawnEpic = (action$, state$) =>
     })
   );
 
-const checkmateEpic = (action$, state$) =>
+const checkEpic = (action$, state$) =>
   action$.pipe(
     ofType(pieceMoved.type),
     map(() => {
       const originalBoardPieces = boardPieces(state$.value).slice();
 
-      if (checkmate(originalBoardPieces, "white", "black")) {
+      if (check(originalBoardPieces, "white", "black")) {
         cleanPiecesStatus(originalBoardPieces);
 
         return whiteKingChecked({
           playersTurn: "white",
           boardPieces:
             lastPlayer(state$.value) === "black"
-              ? movesLog(state$.value)[movesLog(state$.value).length - 1]
+              ? previousMovePieces(state$.value)
               : originalBoardPieces,
         });
       }
-      if (checkmate(originalBoardPieces, "black", "white")) {
+      if (check(originalBoardPieces, "black", "white")) {
         cleanPiecesStatus(originalBoardPieces);
 
         return blackKingChecked({
           playersTurn: "black",
           boardPieces:
             lastPlayer(state$.value) === "white"
-              ? movesLog(state$.value)[movesLog(state$.value).length - 1]
+              ? previousMovePieces(state$.value)
               : originalBoardPieces,
         });
       }
@@ -205,23 +203,38 @@ const storePreviousMoveEpic = (action$, state$) =>
       );
 
       return moveStored({
+        previousMovePieces: boardPiecesCopy,
+      });
+    })
+  );
+
+const addMoveToLogEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(gameResumed.type, blackKingChecked.type, whiteKingChecked.type),
+    filter(() => playersTurn(state$.value) === lastPlayer(state$.value)),
+    map(() => {
+      const boardPiecesCopy = JSON.parse(
+        JSON.stringify(boardPieces(state$.value))
+      );
+
+      return moveAddedToLog({
         movesLog: [...movesLog(state$.value), boardPiecesCopy],
       });
     })
   );
 
-const deletePreviousMoveEpic = (action$, state$) =>
+const deleteMoveFromLogEpic = (action$, state$) =>
   action$.pipe(
-    ofType(moveStored.type),
+    ofType(moveAddedToLog.type),
     filter((action$) => action$.payload.movesLog.length > 10),
     map(() => {
-      const newMovesLog = movesLog(state$.value).slice(
+      const slicedMovesLog = movesLog(state$.value).slice(
         1,
         movesLog(state$.value).length
       );
 
-      return moveDeleted({
-        movesLog: newMovesLog,
+      return moveDeletedFromLog({
+        movesLog: slicedMovesLog,
       });
     })
   );
@@ -230,16 +243,18 @@ export default combineEpics(
   createBoardEpic,
   selectPieceEpic,
   promotePawnEpic,
-  checkmateEpic,
+  checkEpic,
   storePreviousMoveEpic,
-  deletePreviousMoveEpic
+  addMoveToLogEpic,
+  deleteMoveFromLogEpic
 );
 
 export {
   createBoardEpic,
   selectPieceEpic,
   promotePawnEpic,
-  checkmateEpic,
+  checkEpic,
   storePreviousMoveEpic,
-  deletePreviousMoveEpic,
+  addMoveToLogEpic,
+  deleteMoveFromLogEpic,
 };

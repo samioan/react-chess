@@ -23,4 +23,5 @@ export const whiteKingChecked = Action("WHITE_KING_CHECKED");
 export const blackKingChecked = Action("BLACK_KING_CHECKED");
 export const gameResumed = Action("GAME_RESUMED");
 export const moveStored = Action("MOVE_STORED");
-export const moveDeleted = Action("MOVE_DELETED");
+export const moveAddedToLog = Action("MOVE_ADDED_TO_LOG");
+export const moveDeletedFromLog = Action("MOVE_DELETED_FROM_LOG");
