@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 
 import { boardPieces, playersTurn } from "../../models/game/selectors";
 import { startGame, choosePiece } from "../../models/game/actions";
-import colorPicker from "../../lib/colorPicker";
+import alternateTileColors from "../../lib/alternateTileColors";
 
 import styles from "./styles";
 
@@ -30,19 +30,29 @@ const Board = ({
       </Grid>
 
       <div className={classes.board}>
-        {boardPieces.map((tile, index) => (
-          <Tile
-            key={index}
-            color={colorPicker(tile)}
-            type={tile[1]}
-            symbol={tile[3]}
-            onClick={() => onClickChooseHandler(tile)}
-          />
-        ))}
+        {boardPieces.map((row) =>
+          row.map((item) => (
+            <Tile
+              key={item.id}
+              color={alternateTileColors(item)}
+              status={item.status}
+              unicodeSymbol={
+                item.unicodeSymbol && String.fromCharCode(item.unicodeSymbol)
+              }
+              onClick={
+                item.status === "selected" ||
+                item.status === "move" ||
+                item.color === playersTurn
+                  ? () => onClickChooseHandler(item)
+                  : () => {}
+              }
+            />
+          ))
+        )}
       </div>
 
       <Typography variant="h6" align="center" gutterBottom>
-        {playersTurn === "w" ? "White Plays" : "Black Plays"}
+        {playersTurn === "white" ? "White Plays" : "Black Plays"}
       </Typography>
     </div>
   );

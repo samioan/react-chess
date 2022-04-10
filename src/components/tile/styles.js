@@ -6,15 +6,9 @@ const styles = makeStyles(() => ({
     fontSize: 60,
     height: 80,
     width: 80,
-    border: 1,
-    borderStyle: "solid",
-    borderColor: "black",
   },
-  full: {
+  idle: {
     cursor: "pointer",
-  },
-  empty: {
-    cursor: "default",
   },
   selected: {
     cursor: "pointer",

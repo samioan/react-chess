@@ -9,11 +9,7 @@ const Action = (type) => {
 
 export const startGame = Action("START_GAME");
 export const boardCreated = Action("BOARD_CREATED");
-export const piecesCreated = Action("PIECES_CREATED");
-export const piecesSplit = Action("PIECES_SPLIT");
-export const piecesPlaced = Action("PIECES_PLACED");
 export const choosePiece = Action("CHOOSE_PIECE");
-export const pieceSelected = Action("PIECE_SELECTED");
 export const pawnSelected = Action("PAWN_SELECTED");
 export const rookSelected = Action("ROOK_SELECTED");
 export const knightSelected = Action("KNIGHT_SELECTED");
@@ -25,4 +21,7 @@ export const pieceMoved = Action("PIECE_MOVED");
 export const pawnPromoted = Action("PAWN_PROMOTED");
 export const whiteKingChecked = Action("WHITE_KING_CHECKED");
 export const blackKingChecked = Action("BLACK_KING_CHECKED");
-export const continueGame = Action("CONTINUE_GAME");
+export const gameResumed = Action("GAME_RESUMED");
+export const moveStored = Action("MOVE_STORED");
+export const moveAddedToLog = Action("MOVE_ADDED_TO_LOG");
+export const moveDeletedFromLog = Action("MOVE_DELETED_FROM_LOG");
