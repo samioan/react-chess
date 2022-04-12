@@ -20,6 +20,8 @@ import {
   moveStored,
   moveAddedToLog,
   moveDeletedFromLog,
+  whiteKingCheckmated,
+  blackKingCheckmated,
   playersTurn,
   boardPieces,
   previousMovePieces,
@@ -37,7 +39,13 @@ import {
   selectKing,
   selectBishop,
 } from "./util/piecesMoves";
-import { promotePawn, check, cleanPiecesStatus } from "./util/specialActions";
+import {
+  promotePawn,
+  check,
+  cleanPiecesStatus,
+  createAllAvailableMoves,
+  checkEachKingMove,
+} from "./util/specialActions";
 
 const createBoardEpic = (action$) =>
   action$.pipe(
@@ -239,6 +247,83 @@ const deleteMoveFromLogEpic = (action$, state$) =>
     })
   );
 
+const whiteCheckmateEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(whiteKingChecked.type),
+    map(() => {
+      const originalBoardPieces = boardPieces(state$.value).slice();
+
+      const boardPiecesCopy = JSON.parse(
+        JSON.stringify(boardPieces(state$.value))
+      );
+      const secondBoardPiecesCopy = JSON.parse(
+        JSON.stringify(boardPieces(state$.value))
+      );
+
+      const kingCheck = [];
+      createAllAvailableMoves(boardPiecesCopy, "white");
+      checkEachKingMove(secondBoardPiecesCopy, "white").forEach((item) => {
+        if (check(item, "white", "black")) {
+          kingCheck.push({ check: true });
+        } else kingCheck.push({ check: false });
+      });
+
+      if (
+        check(boardPiecesCopy, "white", "black") &&
+        kingCheck.every((item) => item.check)
+      ) {
+        return whiteKingCheckmated({
+          playersTurn: null,
+          boardPieces: originalBoardPieces,
+        });
+      }
+
+      return gameResumed({
+        boardPieces: originalBoardPieces,
+      });
+    })
+  );
+
+const blackCheckmateEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(blackKingChecked.type),
+    map(() => {
+      const originalBoardPieces = boardPieces(state$.value).slice();
+
+      const boardPiecesCopy = JSON.parse(
+        JSON.stringify(boardPieces(state$.value))
+      );
+
+      const secondBoardPiecesCopy = JSON.parse(
+        JSON.stringify(boardPieces(state$.value))
+      );
+
+      const kingCheck = [];
+
+      createAllAvailableMoves(boardPiecesCopy, "black");
+
+      checkEachKingMove(secondBoardPiecesCopy, "black").forEach((item) => {
+        if (check(item, "black", "white")) {
+          kingCheck.push({ check: true });
+        } else kingCheck.push({ check: false });
+      });
+
+      if (
+        check(boardPiecesCopy, "black", "white") &&
+        kingCheck.every((item) => item.check)
+      ) {
+        return blackKingCheckmated({
+          playersTurn: null,
+          boardPieces: originalBoardPieces,
+        });
+      }
+
+      return gameResumed({
+        boardPieces: originalBoardPieces,
+      });
+    })
+  );
+
 export default combineEpics(
   createBoardEpic,
   selectPieceEpic,
@@ -246,7 +331,9 @@ export default combineEpics(
   checkEpic,
   storePreviousMoveEpic,
   addMoveToLogEpic,
-  deleteMoveFromLogEpic
+  deleteMoveFromLogEpic,
+  whiteCheckmateEpic,
+  blackCheckmateEpic
 );
 
 export {
@@ -257,4 +344,6 @@ export {
   storePreviousMoveEpic,
   addMoveToLogEpic,
   deleteMoveFromLogEpic,
+  whiteCheckmateEpic,
+  blackCheckmateEpic,
 };

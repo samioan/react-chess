@@ -15,6 +15,8 @@ import {
   moveStored,
   moveAddedToLog,
   moveDeletedFromLog,
+  whiteKingCheckmated,
+  blackKingCheckmated,
 } from "./actions";
 
 const initialState = {
@@ -118,6 +120,18 @@ const gameReducer = (state = initialState, action) => {
       };
     }
     case moveDeletedFromLog.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case whiteKingCheckmated.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case blackKingCheckmated.type: {
       return {
         ...state,
         ...action.payload,
