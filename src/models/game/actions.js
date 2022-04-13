@@ -25,3 +25,5 @@ export const gameResumed = Action("GAME_RESUMED");
 export const moveStored = Action("MOVE_STORED");
 export const moveAddedToLog = Action("MOVE_ADDED_TO_LOG");
 export const moveDeletedFromLog = Action("MOVE_DELETED_FROM_LOG");
+export const whiteKingCheckmated = Action("WHITE_KING_CHECKMATED");
+export const blackKingCheckmated = Action("BLACK_KING_CHECKMATED");

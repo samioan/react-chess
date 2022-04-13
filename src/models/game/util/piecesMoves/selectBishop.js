@@ -112,7 +112,7 @@ const selectBishop = (piece, pieces) => {
     .forEach((item) => {
       item.status = "move";
     });
-  return bishopMoves;
+  return bishopMoves.filter((item) => item.status === "move");
 };
 
 export { selectBishop };

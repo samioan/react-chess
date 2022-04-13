@@ -17,6 +17,8 @@ import {
   moveStored,
   moveAddedToLog,
   moveDeletedFromLog,
+  whiteKingCheckmated,
+  blackKingCheckmated,
 } from "./actions";
 
 import {
@@ -46,6 +48,8 @@ export {
   moveStored,
   moveAddedToLog,
   moveDeletedFromLog,
+  whiteKingCheckmated,
+  blackKingCheckmated,
   boardPieces,
   playersTurn,
   previousMovePieces,

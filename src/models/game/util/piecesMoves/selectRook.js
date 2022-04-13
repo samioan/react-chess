@@ -85,7 +85,7 @@ const selectRook = (piece, pieces) => {
       item.status = "move";
     });
 
-  return rookMoves;
+  return rookMoves.filter((item) => item.status === "move");
 };
 
 export { selectRook };

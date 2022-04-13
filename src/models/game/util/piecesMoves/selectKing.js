@@ -42,7 +42,7 @@ const selectKing = (piece, pieces) => {
       item.status = "move";
     }
   });
-  return kingMoves;
+  return kingMoves.filter((item) => item.status === "move");
 };
 
 export { selectKing };
