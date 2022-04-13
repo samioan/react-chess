@@ -27,7 +27,11 @@ import {
   previousMovePieces,
   lastPlayer,
   movesLog,
-} from "../game";
+  goToPreviousMove,
+  goToNextMove,
+  movesLogIndex,
+  wentToLoggedMove,
+} from "models/game";
 
 import { createEmptyBoard, placePiecesOnBoard } from "./util/board";
 
@@ -47,7 +51,7 @@ import {
   checkEachKingMove,
 } from "./util/specialActions";
 
-const createBoardEpic = (action$) =>
+const createBoardEpic = (action$, state$) =>
   action$.pipe(
     ofType(startGame.type),
     map(() => {
@@ -55,10 +59,15 @@ const createBoardEpic = (action$) =>
 
       placePiecesOnBoard(newBoardPieces);
 
+      const boardPiecesCopy = JSON.parse(
+        JSON.stringify(placePiecesOnBoard(newBoardPieces))
+      );
+
       return boardCreated({
         playersTurn: "white",
+        movesLogIndex: 0,
         boardPieces: newBoardPieces,
-        movesLog: [newBoardPieces],
+        movesLog: [boardPiecesCopy],
       });
     })
   );
@@ -227,6 +236,7 @@ const addMoveToLogEpic = (action$, state$) =>
 
       return moveAddedToLog({
         movesLog: [...movesLog(state$.value), boardPiecesCopy],
+        movesLogIndex: movesLog(state$.value).length,
       });
     })
   );
@@ -324,6 +334,35 @@ const blackCheckmateEpic = (action$, state$) =>
     })
   );
 
+const goToPreviousMoveEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(goToPreviousMove.type),
+    map(() => {
+      const movesLogCopy = JSON.parse(JSON.stringify(movesLog(state$.value)));
+      const newMovesLogIndex = movesLogIndex(state$.value) - 1;
+
+      return wentToLoggedMove({
+        boardPieces: movesLogCopy[newMovesLogIndex],
+        movesLogIndex: newMovesLogIndex,
+        playersTurn: playersTurn(state$.value) === "white" ? "black" : "white",
+      });
+    })
+  );
+
+const goToNextMoveEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(goToNextMove.type),
+    map(() => {
+      const movesLogCopy = JSON.parse(JSON.stringify(movesLog(state$.value)));
+      const newMovesLogIndex = movesLogIndex(state$.value) + 1;
+
+      return wentToLoggedMove({
+        boardPieces: movesLogCopy[newMovesLogIndex],
+        movesLogIndex: newMovesLogIndex,
+        playersTurn: playersTurn(state$.value) === "white" ? "black" : "white",
+      });
+    })
+  );
 export default combineEpics(
   createBoardEpic,
   selectPieceEpic,
@@ -333,7 +372,9 @@ export default combineEpics(
   addMoveToLogEpic,
   deleteMoveFromLogEpic,
   whiteCheckmateEpic,
-  blackCheckmateEpic
+  blackCheckmateEpic,
+  goToPreviousMoveEpic,
+  goToNextMoveEpic
 );
 
 export {
@@ -346,4 +387,6 @@ export {
   deleteMoveFromLogEpic,
   whiteCheckmateEpic,
   blackCheckmateEpic,
+  goToPreviousMoveEpic,
+  goToNextMoveEpic,
 };

@@ -1,11 +1,16 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-const styles = makeStyles(() => ({
-  tile: {
-    textAlign: "center",
-    fontSize: 60,
-    height: 80,
-    width: 80,
+const styles = makeStyles(({ breakpoints }) => ({
+  colorContainer: {
+    width: "12.5%",
+    height: "100%",
+  },
+  tileContainer: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   idle: {
     cursor: "pointer",
@@ -23,6 +28,12 @@ const styles = makeStyles(() => ({
   },
   dark: {
     backgroundColor: "rgb(112, 102, 119)",
+  },
+  symbol: {
+    fontSize: "1.5rem",
+    [breakpoints.up("sm")]: {
+      fontSize: "4rem",
+    },
   },
 }));
 
