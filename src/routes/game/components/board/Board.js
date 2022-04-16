@@ -1,9 +1,8 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
+
+import alternateTileColors from "./library/alternateTileColors";
 import { Tile } from "./components";
-
-import alternateTileColors from "lib/alternateTileColors";
-
 import styles from "./styles";
 
 const Board = ({ onClickChoosePiece, boardPieces, playersTurn }) => {

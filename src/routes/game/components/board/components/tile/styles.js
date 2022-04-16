@@ -4,6 +4,9 @@ const styles = makeStyles(({ breakpoints }) => ({
   colorContainer: {
     width: "12.5%",
     height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   tileContainer: {
     width: "100%",
@@ -22,6 +25,9 @@ const styles = makeStyles(({ breakpoints }) => ({
   move: {
     cursor: "pointer",
     backgroundColor: "rgb(157, 172, 255)",
+    borderRadius: 50,
+    width: "80%",
+    height: " 80%",
   },
   light: {
     backgroundColor: "rgb(204, 183, 174)",

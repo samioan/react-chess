@@ -1,7 +1,6 @@
 import React from "react";
-import Typography from "@material-ui/core/Typography";
-
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 
 import styles from "./styles";
 
@@ -17,7 +16,9 @@ const Board = ({ playerName, playerAvatar }) => {
           className={classes.avatar}
         />
       ) : (
-        <div className={classes.default}>{playerName.charAt(0)}</div>
+        <div className={classes.default}>
+          <Typography>{playerName.charAt(0)}</Typography>
+        </div>
       )}
       <Typography>{playerName}</Typography>
     </Grid>

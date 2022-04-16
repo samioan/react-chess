@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const styles = makeStyles(() => ({
   appContainer: {
-    height: "100vh",
+    maxHeight: "100vh",
   },
 }));
 

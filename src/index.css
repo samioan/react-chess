@@ -1,4 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap');
+
+* {
+  font-family: "Ubuntu", sans-serif !important;
+}
+
 body {
   background-color: rgba(112, 102, 119, 0.5);
   margin:0
+}
+body:before {
+  z-index: -1;
+  position: fixed;
+  left: 0vw;
+  right: 0vw;
+  top: 0vw;
+  bottom: 0vw;
+  overflow: hidden;
+  content: "";
+  background: url("images/background.jpg") no-repeat fixed center;
+  background-size: cover;
+  opacity: 0.2;
 }
