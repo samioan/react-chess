@@ -19,6 +19,9 @@ import {
   moveDeletedFromLog,
   whiteKingCheckmated,
   blackKingCheckmated,
+  goToPreviousMove,
+  goToNextMove,
+  wentToLoggedMove,
 } from "./actions";
 
 import {
@@ -27,6 +30,7 @@ import {
   previousMovePieces,
   lastPlayer,
   movesLog,
+  movesLogIndex,
 } from "./selectors";
 
 export {
@@ -50,9 +54,13 @@ export {
   moveDeletedFromLog,
   whiteKingCheckmated,
   blackKingCheckmated,
+  goToPreviousMove,
+  goToNextMove,
+  wentToLoggedMove,
   boardPieces,
   playersTurn,
   previousMovePieces,
   lastPlayer,
   movesLog,
+  movesLogIndex,
 };

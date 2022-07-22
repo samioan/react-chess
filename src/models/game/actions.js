@@ -27,3 +27,6 @@ export const moveAddedToLog = Action("MOVE_ADDED_TO_LOG");
 export const moveDeletedFromLog = Action("MOVE_DELETED_FROM_LOG");
 export const whiteKingCheckmated = Action("WHITE_KING_CHECKMATED");
 export const blackKingCheckmated = Action("BLACK_KING_CHECKMATED");
+export const goToPreviousMove = Action("GO_TO_PREVIOUS_MOVE");
+export const goToNextMove = Action("GO_TO_NEXT_MOVE");
+export const wentToLoggedMove = Action("WENT_TO_LOGGED_MOVE");

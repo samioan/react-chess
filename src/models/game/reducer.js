@@ -17,14 +17,18 @@ import {
   moveDeletedFromLog,
   whiteKingCheckmated,
   blackKingCheckmated,
+  goToPreviousMove,
+  goToNextMove,
+  wentToLoggedMove,
 } from "./actions";
 
 const initialState = {
-  playersTurn: "white",
+  playersTurn: null,
   lastPlayer: null,
   boardPieces: [],
   previousMovePieces: [],
   movesLog: [],
+  movesLogIndex: null,
 };
 
 const gameReducer = (state = initialState, action) => {
@@ -132,6 +136,24 @@ const gameReducer = (state = initialState, action) => {
       };
     }
     case blackKingCheckmated.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case goToPreviousMove.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case goToNextMove.type: {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case wentToLoggedMove.type: {
       return {
         ...state,
         ...action.payload,

@@ -1,19 +1,29 @@
-import Typography from "@material-ui/core/Typography";
-import { Board } from "./components";
+import { Game, Intro } from "./routes";
 import store from "./models/store";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 
+import styles from "./styles";
+
 const App = () => {
+  const classes = styles();
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <Typography variant="h4" align="center" gutterBottom>
-          React Chess
-        </Typography>
-        <Board />
-      </BrowserRouter>
-    </Provider>
+    <div className={classes.appContainer}>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/">
+              <Intro />
+            </Route>
+          </Switch>
+          <Switch>
+            <Route exact path="/game">
+              <Game />
+            </Route>
+          </Switch>
+        </BrowserRouter>
+      </Provider>
+    </div>
   );
 };
 
