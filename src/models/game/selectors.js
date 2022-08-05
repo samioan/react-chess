@@ -2,14 +2,14 @@ const playersTurn = (state) => state.game.playersTurn;
 const boardPieces = (state) => state.game.boardPieces;
 const previousMovePieces = (state) => state.game.previousMovePieces;
 const lastPlayer = (state) => state.game.lastPlayer;
-const movesLog = (state) => state.game.movesLog;
-const movesLogIndex = (state) => state.game.movesLogIndex;
+const isCheckSnackbarOpen = (state) => state.game.isCheckSnackbarOpen;
+const isCheckmateModalOpen = (state) => state.game.isCheckmateModalOpen;
 
 export {
   playersTurn,
   boardPieces,
   previousMovePieces,
   lastPlayer,
-  movesLog,
-  movesLogIndex,
+  isCheckSnackbarOpen,
+  isCheckmateModalOpen,
 };

@@ -1,162 +1,82 @@
 import {
-  boardCreated,
-  pawnSelected,
-  rookSelected,
-  knightSelected,
-  bishopSelected,
-  queenSelected,
-  kingSelected,
-  pieceDeselected,
-  pieceMoved,
+  choosePiece,
+  moveCreated,
   pawnPromoted,
-  whiteKingChecked,
-  blackKingChecked,
-  gameResumed,
-  moveStored,
-  moveAddedToLog,
-  moveDeletedFromLog,
-  whiteKingCheckmated,
-  blackKingCheckmated,
-  goToPreviousMove,
-  goToNextMove,
-  wentToLoggedMove,
+  kingChecked,
+  kingCheckmated,
+  closeCheckSnackbar,
+  restartGame,
 } from "./actions";
 
+import { createBoard, onClickTileAction } from "utils";
+import { PLAYER_COLOR, TILE_STATUS } from "reference-data";
+
 const initialState = {
-  playersTurn: null,
+  playersTurn: PLAYER_COLOR.WHITE,
   lastPlayer: null,
-  boardPieces: [],
+  boardPieces: createBoard,
   previousMovePieces: [],
-  movesLog: [],
-  movesLogIndex: null,
+  isCheckSnackbarOpen: false,
+  isCheckmateModalOpen: false,
 };
 
-const gameReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case boardCreated.type: {
+const gameReducer = (state = initialState, { type, payload }) => {
+  switch (type) {
+    case choosePiece.type: {
       return {
         ...state,
-        ...action.payload,
+        lastPlayer:
+          payload.status === TILE_STATUS.MOVE
+            ? state.playersTurn === PLAYER_COLOR.WHITE
+              ? PLAYER_COLOR.WHITE
+              : PLAYER_COLOR.BLACK
+            : state.lastPlayer,
+        playersTurn:
+          payload.status === TILE_STATUS.MOVE
+            ? state.playersTurn === PLAYER_COLOR.WHITE
+              ? PLAYER_COLOR.BLACK
+              : PLAYER_COLOR.WHITE
+            : state.playersTurn,
+        previousMovePieces:
+          payload.status === TILE_STATUS.NOT_SELECTED
+            ? state.boardPieces
+            : state.previousMovePieces,
+        boardPieces: onClickTileAction(payload, state.boardPieces),
       };
     }
-    case pawnSelected.type: {
+    case moveCreated.type: {
       return {
         ...state,
-        ...action.payload,
-      };
-    }
-    case rookSelected.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case knightSelected.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case bishopSelected.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case queenSelected.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case kingSelected.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case pieceDeselected.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case pieceMoved.type: {
-      return {
-        ...state,
-        ...action.payload,
+        ...payload,
       };
     }
     case pawnPromoted.type: {
       return {
         ...state,
-        ...action.payload,
+        ...payload,
       };
     }
-    case whiteKingChecked.type: {
+    case kingChecked.type: {
       return {
         ...state,
-        ...action.payload,
+        ...payload,
       };
     }
-    case blackKingChecked.type: {
+    case closeCheckSnackbar.type: {
       return {
         ...state,
-        ...action.payload,
+        isCheckSnackbarOpen: false,
       };
     }
-    case gameResumed.type: {
+    case kingCheckmated.type: {
       return {
         ...state,
-        ...action.payload,
+        ...payload,
       };
     }
-    case moveStored.type: {
+    case restartGame.type: {
       return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case moveAddedToLog.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case moveDeletedFromLog.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case whiteKingCheckmated.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case blackKingCheckmated.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case goToPreviousMove.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case goToNextMove.type: {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    case wentToLoggedMove.type: {
-      return {
-        ...state,
-        ...action.payload,
+        ...initialState,
       };
     }
     default:
