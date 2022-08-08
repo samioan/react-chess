@@ -3,12 +3,10 @@ import { makeStyles } from "@material-ui/core/styles";
 const styles = makeStyles(({ breakpoints }) => ({
   gameContainer: {
     width: "40vh",
-    height: "40vh",
     margin: "auto",
     padding: 8,
     [breakpoints.up("sm")]: {
       width: "70vh",
-      height: "70vh",
     },
   },
   boardContainer: {
@@ -21,10 +19,19 @@ const styles = makeStyles(({ breakpoints }) => ({
     marginTop: 16,
     marginBottom: 16,
   },
-  buttonContainer: {
-    marginTop: 16,
+  modal: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    backgroundColor: "white",
     display: "flex",
-    justifyContent: "center",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: 16,
+    gap: 16,
+    borderRadius: 8,
   },
 }));
 

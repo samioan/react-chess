@@ -1,17 +1,15 @@
 import React from "react";
-import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
 
-import { boardPieces, playersTurn, startGame } from "models/game";
-
 import links from "./constants/links";
 import styles from "./styles";
 
-const Intro = ({ onClickPlayHandler }) => {
+const Intro = () => {
   const classes = styles();
 
   return (
@@ -32,11 +30,7 @@ const Intro = ({ onClickPlayHandler }) => {
 
         <Divider />
 
-        <Button
-          onClick={onClickPlayHandler}
-          href="game"
-          className={classes.button}
-        >
+        <Button component={Link} to="game" className={classes.button}>
           New Game
         </Button>
 
@@ -54,14 +48,5 @@ const Intro = ({ onClickPlayHandler }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  boardPieces: boardPieces(state),
-  playersTurn: playersTurn(state),
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  onClickPlayHandler: () => dispatch(startGame()),
-});
-
 export { Intro };
-export default connect(mapStateToProps, mapDispatchToProps)(Intro);
+export default Intro;

@@ -4,12 +4,12 @@ import Typography from "@material-ui/core/Typography";
 
 import styles from "./styles";
 
-const Board = ({ playerName, playerAvatar }) => {
+const PlayerInfo = ({ playerName, playerAvatar }) => {
   const classes = styles();
 
   return (
     <Grid container className={classes.playerContainer}>
-      {playerAvatar ? (
+      {!!playerAvatar ? (
         <img
           src={playerAvatar}
           alt={playerName.charAt(0)}
@@ -25,5 +25,5 @@ const Board = ({ playerName, playerAvatar }) => {
   );
 };
 
-export { Board };
-export default Board;
+export { PlayerInfo };
+export default PlayerInfo;
