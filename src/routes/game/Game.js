@@ -34,7 +34,7 @@ const Game = ({
 
   return (
     <div className={classes.gameContainer}>
-      <PlayerInfo playerName="Steve" />
+      <PlayerInfo playerName="Player 1" />
 
       <div className={classes.boardContainer}>
         <Board
@@ -44,7 +44,7 @@ const Game = ({
         />
       </div>
 
-      <PlayerInfo playerName="Robert" />
+      <PlayerInfo playerName="Player 2" />
 
       <Snackbar
         open={isCheckSnackbarOpen}
