@@ -2,391 +2,138 @@ import { map, filter } from "rxjs/operators";
 import { combineEpics, ofType } from "redux-observable";
 
 import {
-  startGame,
-  boardCreated,
   choosePiece,
-  pawnSelected,
-  rookSelected,
-  knightSelected,
-  bishopSelected,
-  queenSelected,
-  kingSelected,
-  pieceDeselected,
-  pieceMoved,
+  moveCreated,
   pawnPromoted,
-  whiteKingChecked,
-  blackKingChecked,
-  gameResumed,
-  moveStored,
-  moveAddedToLog,
-  moveDeletedFromLog,
-  whiteKingCheckmated,
-  blackKingCheckmated,
+  kingChecked,
+  kingCheckmated,
   playersTurn,
   boardPieces,
   previousMovePieces,
   lastPlayer,
-  movesLog,
-  goToPreviousMove,
-  goToNextMove,
-  movesLogIndex,
-  wentToLoggedMove,
 } from "models/game";
-
-import { createEmptyBoard, placePiecesOnBoard } from "./util/board";
-
-import { selectPiece, deselectPiece, movePiece } from "./util/piecesActions";
 import {
   selectPawn,
   selectKnight,
   selectRook,
   selectKing,
   selectBishop,
-} from "./util/piecesMoves";
-import {
-  promotePawn,
-  check,
-  cleanPiecesStatus,
-  createAllAvailableMoves,
-  checkEachKingMove,
-} from "./util/specialActions";
+  selectQueen,
+  pawnPromotion,
+  checkmate,
+  castlingBoards,
+} from "utils";
+import { TILE_STATUS, RANK, KING_STATUS } from "reference-data";
 
-const createBoardEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(startGame.type),
-    map(() => {
-      const newBoardPieces = createEmptyBoard();
-
-      placePiecesOnBoard(newBoardPieces);
-
-      const boardPiecesCopy = JSON.parse(
-        JSON.stringify(placePiecesOnBoard(newBoardPieces))
-      );
-
-      return boardCreated({
-        playersTurn: "white",
-        movesLogIndex: 0,
-        boardPieces: newBoardPieces,
-        movesLog: [boardPiecesCopy],
-      });
-    })
-  );
-
-const selectPieceEpic = (action$, state$) =>
+const createMoveEpic = (action$, state$) =>
   action$.pipe(
     ofType(choosePiece.type),
-    map((action$) => {
-      const originalBoardPieces = boardPieces(state$.value).slice(0);
-
-      const piece = action$.payload;
-
-      switch (piece.status) {
-        case "idle":
-          cleanPiecesStatus(originalBoardPieces);
-          selectPiece(piece, originalBoardPieces);
-
-          if (piece.status === "selected") {
-            switch (piece.rank) {
-              case "pawn":
-                selectPawn(piece, originalBoardPieces);
-
-                return pawnSelected({
-                  boardPieces: originalBoardPieces,
-                });
-              case "knight":
-                selectKnight(piece, originalBoardPieces);
-
-                return knightSelected({
-                  boardPieces: originalBoardPieces,
-                });
-              case "rook":
-                selectRook(piece, originalBoardPieces);
-
-                return rookSelected({
-                  boardPieces: originalBoardPieces,
-                });
-              case "bishop":
-                selectBishop(piece, originalBoardPieces);
-
-                return bishopSelected({
-                  boardPieces: originalBoardPieces,
-                });
-              case "queen":
-                selectRook(piece, originalBoardPieces);
-                selectBishop(piece, originalBoardPieces);
-
-                return queenSelected({
-                  boardPieces: originalBoardPieces,
-                });
-              case "king":
-                selectKing(piece, originalBoardPieces);
-
-                return kingSelected({
-                  boardPieces: originalBoardPieces,
-                });
-              default:
-            }
+    filter(
+      ({ payload }) =>
+        payload.status === TILE_STATUS.NOT_SELECTED && !!payload.rank
+    ),
+    map(({ payload }) =>
+      moveCreated({
+        boardPieces: (() => {
+          switch (payload.rank) {
+            case RANK.PAWN:
+              return selectPawn(payload, boardPieces(state$.value));
+            case RANK.KNIGHT:
+              return selectKnight(payload, boardPieces(state$.value));
+            case RANK.ROOK:
+              return selectRook(payload, boardPieces(state$.value));
+            case RANK.BISHOP:
+              return selectBishop(payload, boardPieces(state$.value));
+            case RANK.QUEEN:
+              return selectQueen(payload, boardPieces(state$.value));
+            case RANK.KING:
+              return selectKing(
+                payload,
+                boardPieces(state$.value),
+                checkmate(
+                  boardPieces(state$.value),
+                  playersTurn(state$.value)
+                ) === KING_STATUS.CHECK,
+                checkmate(
+                  castlingBoards(
+                    boardPieces(state$.value),
+                    playersTurn(state$.value)
+                  ).kingside,
+                  playersTurn(state$.value)
+                ) === KING_STATUS.CHECK,
+                checkmate(
+                  castlingBoards(
+                    boardPieces(state$.value),
+                    playersTurn(state$.value)
+                  ).queenside,
+                  playersTurn(state$.value)
+                ) === KING_STATUS.CHECK
+              );
+            default:
+              return boardPieces(state$.value);
           }
-          break;
-        case "selected":
-          cleanPiecesStatus(originalBoardPieces);
-          deselectPiece(piece);
-
-          return pieceDeselected({
-            boardPieces: originalBoardPieces,
-          });
-
-        case "move":
-          movePiece(piece, originalBoardPieces);
-          cleanPiecesStatus(originalBoardPieces);
-
-          return pieceMoved({
-            lastPlayer:
-              playersTurn(state$.value) === "white" ? "black" : "white",
-            boardPieces: originalBoardPieces,
-          });
-        default:
-      }
-    })
+        })(),
+      })
+    )
   );
 
-const promotePawnEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(pieceMoved.type),
+const promotePawnEpic = (_, state$) =>
+  state$.pipe(
     filter(
-      (action$) =>
-        action$.payload.boardPieces[0].some(
-          (item) => item.color === "white" && item.rank === "pawn"
-        ) ||
-        action$.payload.boardPieces[7].some(
-          (item) => item.color === "black" && item.rank === "pawn"
-        )
+      () =>
+        boardPieces(state$.value)[0].some(({ rank }) => rank === RANK.PAWN) ||
+        boardPieces(state$.value)[7].some(({ rank }) => rank === RANK.PAWN)
     ),
-    map(() => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-
-      promotePawn(originalBoardPieces);
-
-      return pawnPromoted({
-        boardPieces: originalBoardPieces,
-      });
-    })
+    map(() =>
+      pawnPromoted({
+        boardPieces: pawnPromotion(boardPieces(state$.value)),
+      })
+    )
   );
 
 const checkEpic = (action$, state$) =>
   action$.pipe(
-    ofType(pieceMoved.type),
-    map(() => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-
-      if (check(originalBoardPieces, "white", "black")) {
-        cleanPiecesStatus(originalBoardPieces);
-
-        return whiteKingChecked({
-          playersTurn: "white",
-          boardPieces:
-            lastPlayer(state$.value) === "black"
-              ? previousMovePieces(state$.value)
-              : originalBoardPieces,
-        });
-      }
-      if (check(originalBoardPieces, "black", "white")) {
-        cleanPiecesStatus(originalBoardPieces);
-
-        return blackKingChecked({
-          playersTurn: "black",
-          boardPieces:
-            lastPlayer(state$.value) === "white"
-              ? previousMovePieces(state$.value)
-              : originalBoardPieces,
-        });
-      }
-
-      cleanPiecesStatus(originalBoardPieces);
-
-      return gameResumed({
-        playersTurn: playersTurn(state$.value) === "white" ? "black" : "white",
-        boardPieces: originalBoardPieces,
-      });
-    })
+    ofType(choosePiece.type),
+    filter(({ payload }) => payload.status === TILE_STATUS.MOVE),
+    map(() =>
+      kingChecked({
+        ...(checkmate(boardPieces(state$.value), lastPlayer(state$.value)) ===
+        KING_STATUS.CHECK
+          ? {
+              boardPieces: previousMovePieces(state$.value),
+              playersTurn: lastPlayer(state$.value),
+              isCheckSnackbarOpen: true,
+            }
+          : {
+              boardPieces: boardPieces(state$.value),
+              playersTurn: playersTurn(state$.value),
+              isCheckSnackbarOpen: false,
+            }),
+      })
+    )
   );
 
-const storePreviousMoveEpic = (action$, state$) =>
+const checkmateEpic = (action$, state$) =>
   action$.pipe(
-    ofType(gameResumed.type, blackKingChecked.type, whiteKingChecked.type),
-    map(() => {
-      const boardPiecesCopy = JSON.parse(
-        JSON.stringify(boardPieces(state$.value))
-      );
-
-      return moveStored({
-        previousMovePieces: boardPiecesCopy,
-      });
-    })
+    ofType(choosePiece.type),
+    filter(({ payload }) => payload.status === TILE_STATUS.MOVE),
+    filter(
+      () =>
+        checkmate(boardPieces(state$.value), playersTurn(state$.value)) ===
+        KING_STATUS.CHECKMATE
+    ),
+    map(() =>
+      kingCheckmated({
+        isCheckmateModalOpen: true,
+      })
+    )
   );
 
-const addMoveToLogEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(gameResumed.type, blackKingChecked.type, whiteKingChecked.type),
-    filter(() => playersTurn(state$.value) === lastPlayer(state$.value)),
-    map(() => {
-      const boardPiecesCopy = JSON.parse(
-        JSON.stringify(boardPieces(state$.value))
-      );
-
-      return moveAddedToLog({
-        movesLog: [...movesLog(state$.value), boardPiecesCopy],
-        movesLogIndex: movesLog(state$.value).length,
-      });
-    })
-  );
-
-const deleteMoveFromLogEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(moveAddedToLog.type),
-    filter((action$) => action$.payload.movesLog.length > 10),
-    map(() => {
-      const slicedMovesLog = movesLog(state$.value).slice(
-        1,
-        movesLog(state$.value).length
-      );
-
-      return moveDeletedFromLog({
-        movesLog: slicedMovesLog,
-      });
-    })
-  );
-
-const whiteCheckmateEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(whiteKingChecked.type),
-    map(() => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-
-      const boardPiecesCopy = JSON.parse(
-        JSON.stringify(boardPieces(state$.value))
-      );
-      const secondBoardPiecesCopy = JSON.parse(
-        JSON.stringify(boardPieces(state$.value))
-      );
-
-      const kingCheck = [];
-      createAllAvailableMoves(boardPiecesCopy, "white");
-      checkEachKingMove(secondBoardPiecesCopy, "white").forEach((item) => {
-        if (check(item, "white", "black")) {
-          kingCheck.push({ check: true });
-        } else kingCheck.push({ check: false });
-      });
-
-      if (
-        check(boardPiecesCopy, "white", "black") &&
-        kingCheck.every((item) => item.check)
-      ) {
-        return whiteKingCheckmated({
-          playersTurn: null,
-          boardPieces: originalBoardPieces,
-        });
-      }
-
-      return gameResumed({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
-const blackCheckmateEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(blackKingChecked.type),
-    map(() => {
-      const originalBoardPieces = boardPieces(state$.value).slice();
-
-      const boardPiecesCopy = JSON.parse(
-        JSON.stringify(boardPieces(state$.value))
-      );
-
-      const secondBoardPiecesCopy = JSON.parse(
-        JSON.stringify(boardPieces(state$.value))
-      );
-
-      const kingCheck = [];
-
-      createAllAvailableMoves(boardPiecesCopy, "black");
-
-      checkEachKingMove(secondBoardPiecesCopy, "black").forEach((item) => {
-        if (check(item, "black", "white")) {
-          kingCheck.push({ check: true });
-        } else kingCheck.push({ check: false });
-      });
-
-      if (
-        check(boardPiecesCopy, "black", "white") &&
-        kingCheck.every((item) => item.check)
-      ) {
-        return blackKingCheckmated({
-          playersTurn: null,
-          boardPieces: originalBoardPieces,
-        });
-      }
-
-      return gameResumed({
-        boardPieces: originalBoardPieces,
-      });
-    })
-  );
-
-const goToPreviousMoveEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(goToPreviousMove.type),
-    map(() => {
-      const movesLogCopy = JSON.parse(JSON.stringify(movesLog(state$.value)));
-      const newMovesLogIndex = movesLogIndex(state$.value) - 1;
-
-      return wentToLoggedMove({
-        boardPieces: movesLogCopy[newMovesLogIndex],
-        movesLogIndex: newMovesLogIndex,
-        playersTurn: playersTurn(state$.value) === "white" ? "black" : "white",
-      });
-    })
-  );
-
-const goToNextMoveEpic = (action$, state$) =>
-  action$.pipe(
-    ofType(goToNextMove.type),
-    map(() => {
-      const movesLogCopy = JSON.parse(JSON.stringify(movesLog(state$.value)));
-      const newMovesLogIndex = movesLogIndex(state$.value) + 1;
-
-      return wentToLoggedMove({
-        boardPieces: movesLogCopy[newMovesLogIndex],
-        movesLogIndex: newMovesLogIndex,
-        playersTurn: playersTurn(state$.value) === "white" ? "black" : "white",
-      });
-    })
-  );
 export default combineEpics(
-  createBoardEpic,
-  selectPieceEpic,
+  createMoveEpic,
   promotePawnEpic,
   checkEpic,
-  storePreviousMoveEpic,
-  addMoveToLogEpic,
-  deleteMoveFromLogEpic,
-  whiteCheckmateEpic,
-  blackCheckmateEpic,
-  goToPreviousMoveEpic,
-  goToNextMoveEpic
+  checkmateEpic
 );
 
-export {
-  createBoardEpic,
-  selectPieceEpic,
-  promotePawnEpic,
-  checkEpic,
-  storePreviousMoveEpic,
-  addMoveToLogEpic,
-  deleteMoveFromLogEpic,
-  whiteCheckmateEpic,
-  blackCheckmateEpic,
-  goToPreviousMoveEpic,
-  goToNextMoveEpic,
-};
+export { createMoveEpic, promotePawnEpic, checkEpic, checkmateEpic };

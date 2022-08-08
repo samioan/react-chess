@@ -5,12 +5,12 @@ import alternateTileColors from "./library/alternateTileColors";
 import { Tile } from "./components";
 import styles from "./styles";
 
-const Board = ({ onClickChoosePiece, boardPieces, playersTurn }) => {
+const Board = ({ choosePiece, boardPieces, playersTurn }) => {
   const classes = styles();
 
   return (
     <div className={classes.board}>
-      {boardPieces.map((row, index) => (
+      {boardPieces?.map((row, index) => (
         <Grid key={index} container className={classes.rowContainer}>
           {row.map((item) => (
             <Tile
@@ -24,7 +24,7 @@ const Board = ({ onClickChoosePiece, boardPieces, playersTurn }) => {
                 item.status === "selected" ||
                 item.status === "move" ||
                 item.color === playersTurn
-                  ? () => onClickChoosePiece(item)
+                  ? () => choosePiece(item)
                   : () => {}
               }
             />

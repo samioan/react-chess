@@ -1,74 +1,66 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
+
+import Modal from "@material-ui/core/Modal";
+import Button from "@material-ui/core/Button";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import {
   boardPieces,
   playersTurn,
-  movesLog,
-  startGame,
+  lastPlayer,
+  isCheckSnackbarOpen,
+  isCheckmateModalOpen,
   choosePiece,
-  goToPreviousMove,
-  goToNextMove,
-  movesLogIndex,
+  closeCheckSnackbar,
+  restartGame,
 } from "models/game";
 
-import { Board, PlayerInfo, ActionButton } from "./components";
-import actionButtonsArray from "./constants/actionButtonsArray";
+import { Board, PlayerInfo } from "./components";
+
 import styles from "./styles";
 
 const Game = ({
-  onClickPlay,
-  onClickChoosePiece,
-  onClickPreviousMove,
-  onClickNextMove,
   boardPieces,
   playersTurn,
-  movesLog,
-  movesLogIndex,
+  lastPlayer,
+  isCheckSnackbarOpen,
+  isCheckmateModalOpen,
+  choosePiece,
+  closeCheckSnackbar,
+  restartGame,
 }) => {
   const classes = styles();
 
-  useEffect(() => {
-    onClickPlay();
-    // eslint-disable-next-line
-  }, []);
-
   return (
     <div className={classes.gameContainer}>
-      <PlayerInfo playerName="Steve" playerAvatar="" />
+      <PlayerInfo playerName="Player 1" />
 
       <div className={classes.boardContainer}>
         <Board
-          onClickPlay={onClickPlay}
-          onClickChoosePiece={onClickChoosePiece}
-          onClickPreviousMove={onClickPreviousMove}
-          onClickNextMove={onClickNextMove}
+          choosePiece={choosePiece}
           boardPieces={boardPieces}
           playersTurn={playersTurn}
-          movesLog={movesLog}
-          movesLogIndex={movesLogIndex}
         />
       </div>
 
-      <PlayerInfo playerName="Robert" playerAvatar="" />
+      <PlayerInfo playerName="Player 2" />
 
-      <div className={classes.buttonContainer}>
-        {actionButtonsArray(
-          onClickPlay,
-          onClickPreviousMove,
-          movesLogIndex,
-          onClickNextMove,
-          movesLog
-        ).map((item) => (
-          <ActionButton
-            key={item.tooltipTitle}
-            tooltipTitle={item.tooltipTitle}
-            onClick={item.onClick}
-            disabled={item.disabled}
-            icon={item.icon}
-          />
-        ))}
-      </div>
+      <Snackbar
+        open={isCheckSnackbarOpen}
+        onClose={closeCheckSnackbar}
+        autoHideDuration={1500}
+        message="Your king is in check!"
+      />
+
+      <Modal open={isCheckmateModalOpen}>
+        <div className={classes.modal}>
+          {`Checkmate! ${lastPlayer} wins!`}
+          <Button variant="contained" onClick={restartGame}>
+            Restart Game
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };
@@ -76,15 +68,15 @@ const Game = ({
 const mapStateToProps = (state) => ({
   boardPieces: boardPieces(state),
   playersTurn: playersTurn(state),
-  movesLog: movesLog(state),
-  movesLogIndex: movesLogIndex(state),
+  lastPlayer: lastPlayer(state),
+  isCheckmateModalOpen: isCheckmateModalOpen(state),
+  isCheckSnackbarOpen: isCheckSnackbarOpen(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onClickPlay: () => dispatch(startGame()),
-  onClickChoosePiece: (piece) => dispatch(choosePiece(piece)),
-  onClickPreviousMove: () => dispatch(goToPreviousMove()),
-  onClickNextMove: () => dispatch(goToNextMove()),
+  choosePiece: (piece) => dispatch(choosePiece(piece)),
+  closeCheckSnackbar: () => dispatch(closeCheckSnackbar()),
+  restartGame: () => dispatch(restartGame()),
 });
 
 export { Game };
