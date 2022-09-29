@@ -25,13 +25,31 @@ const styles = makeStyles(({ breakpoints }) => ({
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: 400,
-    backgroundColor: "white",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     padding: 16,
     gap: 16,
     borderRadius: 8,
+    backgroundColor: "rgb(111, 115, 210)",
+    boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
+  },
+  modalTitle: {
+    marginBottom: 16,
+    fontSize: "2.125rem",
+    fontWeight: 400,
+    lineHeight: 1.235,
+    letterSpacing: "0.00735em",
+  },
+  modalSubtitle: {
+    marginBottom: 16,
+    fontSize: "1.25rem",
+    fontWeight: 500,
+    lineHeight: 1.6,
+    letterSpacing: "0.0075em",
+  },
+  modalButton: {
+    width: "100%",
   },
 }));
 
