@@ -1,4 +1,5 @@
 import { Game, Intro } from "./routes";
+import { Footer } from "./components";
 import store from "./models/store";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -16,6 +17,7 @@ const App = () => (
           <Game />
         </Route>
       </Switch>
+      <Footer />
     </BrowserRouter>
   </Provider>
 );

@@ -12,13 +12,20 @@ const styles = makeStyles(() => ({
   },
   title: {
     marginBottom: 16,
+    fontSize: "2.125rem",
+    fontWeight: 400,
+    lineHeight: 1.235,
+    letterSpacing: "0.00735em",
+  },
+  subtitle: {
+    marginBottom: 16,
+    fontSize: "1.25rem",
+    fontWeight: 500,
+    lineHeight: 1.6,
+    letterSpacing: "0.0075em",
   },
   button: {
     marginTop: 16,
-    marginBottom: 8,
-  },
-  buttonMiddle: {
-    marginBottom: 8,
   },
 }));
 
